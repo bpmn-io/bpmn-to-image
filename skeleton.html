@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Diagram Viewer</title>
+
+    <!-- viewer distro -->
+    <script src="node_modules/bpmn-js/dist/bpmn-viewer.production.min.js"></script>
+
+    <!-- example styles -->
+    <style>
+      html, body, #canvas {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvas"></div>
+
+    <script>
+
+      // viewer instance
+      var bpmnViewer = new BpmnJS({
+        container: '#canvas'
+      });
+
+      // access viewer components
+      var canvas = bpmnViewer.get('canvas');
+
+
+      bpmnViewer.on('import.done', function(event) {
+
+        var error = event.error;
+        var warnings = event.warnings;
+
+        if (error) {
+          return console.error('could not import BPMN 2.0 diagram', error);
+        }
+
+        // zoom to fit full viewport
+        canvas.zoom('fit-viewport');
+      });
+
+
+      /**
+       * Open diagram in our viewer instance.
+       *
+       * @param {String} bpmnXML diagram to display
+       *
+       * @return {Promise<Bounds, Error>}
+       */
+      function openDiagram(bpmnXML) {
+
+        return new Promise(function(resolve, reject) {
+          bpmnViewer.importXML(bpmnXML, function(err) {
+
+            if (err) {
+              return reject(err);
+            }
+
+            var viewbox = canvas.viewbox();
+
+            var desiredViewport = {
+              width: viewbox.inner.width,
+              height: viewbox.inner.height + 90
+            };
+
+            return resolve(desiredViewport);
+          });
+        });
+      }
+
+      function resize() {
+        return new Promise(function(resolve, reject) {
+          canvas.resized();
+
+          canvas.zoom('fit-viewport');
+
+          return resolve();
+        });
+      }
+    </script>
+  </body>
+</html>
