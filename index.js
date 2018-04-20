@@ -9,16 +9,17 @@ async function printDiagram(page, options) {
 
   const {
     input,
-    outputs
+    outputs,
+    minDimensions
   } = options;
 
   const diagramXML = readFileSync(input, 'utf8');
 
   await page.goto(`file://${__dirname}/skeleton.html`);
 
-  const desiredViewport = await page.evaluate((diagramXML) => {
-    return openDiagram(diagramXML);
-  }, diagramXML);
+  const desiredViewport = await page.evaluate((diagramXML, minDimensions) => {
+    return openDiagram(diagramXML, minDimensions);
+  }, diagramXML, minDimensions);
 
   page.setViewport({
     width: desiredViewport.width,
@@ -31,15 +32,15 @@ async function printDiagram(page, options) {
 
   for (const output of outputs) {
 
+    console.log(`writing ${output}`);
+
     if (output.endsWith('.pdf')) {
       await page.pdf({
         path: output,
         width: desiredViewport.width,
         height: desiredViewport.height
       });
-
-      console.log(`wrote ${output}`);
-    };
+    } else
 
     if (output.endsWith('.png')) {
       await page.screenshot({
@@ -51,8 +52,8 @@ async function printDiagram(page, options) {
           height: desiredViewport.height
         }
       });
-
-      console.log(`wrote ${output}`);
+    } else {
+      console.error(`Unknown output file format: ${output}`);
     }
   }
 
@@ -79,7 +80,11 @@ async function withPage(fn) {
 }
 
 
-module.exports.convertAll = async function(conversions) {
+module.exports.convertAll = async function(conversions, options={}) {
+
+  const {
+    minDimensions
+  } = options;
 
   await withPage(async function(page) {
 
@@ -92,7 +97,8 @@ module.exports.convertAll = async function(conversions) {
 
       await printDiagram(page, {
         input,
-        outputs
+        outputs,
+        minDimensions
       });
     }
 

@@ -16,8 +16,11 @@ const cli = meow(`
 
   Options
 
-    diagramFile     Path to BPMN diagram
-    outputConfig    List of extension or output file paths
+    diagramFile         Path to BPMN diagram
+    outputConfig        List of extension or output file paths
+
+    --min-dimensions    Minimum size in pixels (<width>x<height>)
+
 
   Examples
 
@@ -26,7 +29,17 @@ const cli = meow(`
 
     # export diagram.png and /tmp/diagram.pdf
     $ bpmn-to-image diagram.bpmn:diagram.png,/tmp/diagram.pdf
-`);
+
+    # export with minimum size of 500x300 pixels
+    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn:png
+`, {
+  flags: {
+    minDimensions: {
+      type: 'string',
+      default: '400x300'
+    }
+  }
+});
 
 
 const conversions = cli.input.map(function(conversion) {
@@ -57,7 +70,13 @@ const conversions = cli.input.map(function(conversion) {
 });
 
 
-convertAll(conversions).catch(function(e) {
+const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
+  return parseInt(d, 10);
+});
+
+convertAll(conversions, {
+  minDimensions: { width, height }
+}).catch(function(e) {
   console.error('failed to export diagram(s)');
   console.error(e);
 

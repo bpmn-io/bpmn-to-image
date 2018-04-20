@@ -48,10 +48,16 @@
        * Open diagram in our viewer instance.
        *
        * @param {String} bpmnXML diagram to display
+       * @param {Dimensions} [minDimensions]
        *
        * @return {Promise<Bounds, Error>}
        */
-      function openDiagram(bpmnXML) {
+      function openDiagram(bpmnXML, minDimensions) {
+
+        minDimensions = minDimensions || {
+          width: 0,
+          height: 0
+        };
 
         return new Promise(function(resolve, reject) {
           bpmnViewer.importXML(bpmnXML, function(err) {
@@ -63,8 +69,8 @@
             var viewbox = canvas.viewbox();
 
             var desiredViewport = {
-              width: viewbox.inner.width,
-              height: viewbox.inner.height + 90
+              width: Math.max(viewbox.inner.width, minDimensions.width),
+              height: Math.max(viewbox.inner.height + 90, minDimensions.height)
             };
 
             return resolve(desiredViewport);
