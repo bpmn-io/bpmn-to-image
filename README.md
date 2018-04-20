@@ -7,6 +7,8 @@ Convert [BPMN 2.0 diagrams](https://www.omg.org/spec/BPMN/2.0) to PDF documents 
 
 ## Usage
 
+This package exposes the `bpmn-to-image` command line utility that allows you to convert BPMN 2.0 diagrams to PNG and PDF documents:
+
 ```bash
 $ bpmn-to-image --help
 
@@ -29,6 +31,29 @@ $ bpmn-to-image --help
     # export diagram.png and /tmp/diagram.pdf
     $ bpmn-to-image diagram.bpmn:diagram.png,/tmp/diagram.pdf
 ```
+
+
+## Embedding
+
+You may embed [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image) and use it as parts of your application:
+
+```javascript
+const {
+  convertAll
+} = require('bpmn-to-image');
+
+await convertAll([
+  {
+    input: 'diagram.bpmn',
+    outputs: [
+      'diagram.pdf',
+      'diagram.png'
+    ]
+  }
+]);
+```
+
+This renders the BPMN diagram using [bpmn-js](https://github.com/bpmn-io/bpmn-js) and exports it to the specified output files using [Puppeteer](https://github.com/GoogleChrome/puppeteer).
 
 
 ## Install
