@@ -16,10 +16,13 @@ const cli = meow(`
 
   Options
 
-    diagramFile         Path to BPMN diagram
-    outputConfig        List of extension or output file paths
+    diagramFile                    Path to BPMN diagram
+    outputConfig                   List of extension or output file paths
 
-    --min-dimensions    Minimum size in pixels (<width>x<height>)
+    --min-dimensions=<dimensions>  Minimum size in pixels (<width>x<height>)
+
+    --title=<title>                Add explicit <title> to exported image
+    --no-title                     Don't display title on exported image
 
 
   Examples
@@ -37,6 +40,14 @@ const cli = meow(`
     minDimensions: {
       type: 'string',
       default: '400x300'
+    },
+    title: {
+      default: '',
+      type: 'string'
+    },
+    noTitle: {
+      type: 'boolean',
+      default: false
     }
   }
 });
@@ -70,12 +81,15 @@ const conversions = cli.input.map(function(conversion) {
 });
 
 
+const title = cli.flags.noTitle ? false : cli.flags.title;
+
 const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
   return parseInt(d, 10);
 });
 
 convertAll(conversions, {
-  minDimensions: { width, height }
+  minDimensions: { width, height },
+  title
 }).catch(function(e) {
   console.error('failed to export diagram(s)');
   console.error(e);

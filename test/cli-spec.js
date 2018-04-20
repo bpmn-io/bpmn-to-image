@@ -94,18 +94,64 @@ describe('cli', function() {
       });
 
 
-      it('cli overrides', async function() {
+      it('cli override', async function() {
 
         // when
         await runExport([
           `small.bpmn:small_custom_size.png`
         ], {
-          width: 500,
-          height: 400
+          minDimensions: {
+            width: 500,
+            height: 400
+          }
         });
 
         // then
         expectExists(`${__dirname}/small_custom_size.png`, true);
+      });
+
+    });
+
+
+    describe('with title', function() {
+
+      it('from definitions', async function() {
+
+        // when
+        await runExport([
+          `title.bpmn:title_default.png`
+        ]);
+
+        // then
+        expectExists(`${__dirname}/title_default.png`, true);
+      });
+
+
+      it('explicit cli override', async function() {
+
+        // when
+        await runExport([
+          `title.bpmn:custom_title.png`
+        ], {
+          title: 'FOO BAR'
+        });
+
+        // then
+        expectExists(`${__dirname}/custom_title.png`, true);
+      });
+
+
+      it('explicit cli opt-out', async function() {
+
+        // when
+        await runExport([
+          `title.bpmn:no_title.png`
+        ], {
+          title: false
+        });
+
+        // then
+        expectExists(`${__dirname}/no_title.png`, true);
       });
 
     });
@@ -115,8 +161,15 @@ describe('cli', function() {
 });
 
 
-async function runExport(conversions, minDimensions) {
+// helpers ///////////////////
+
+async function runExport(conversions, options = {}) {
   let args = [ ...conversions ];
+
+  const {
+    minDimensions,
+    title
+  } = options;
 
   if (minDimensions) {
     args = [
@@ -125,7 +178,28 @@ async function runExport(conversions, minDimensions) {
     ]
   };
 
-  await execa('../cli.js', args, { cwd: __dirname });
+  if (typeof title !== 'undefined') {
+
+    if (title === false) {
+      args = [
+        ...args,
+        '--no-title'
+      ];
+    } else
+    if (title !== true) {
+
+      args = [
+        ...args,
+        `--title=${title}`
+      ];
+    }
+  }
+
+  await execa('../cli.js', args, {
+    stdout: 'inherit',
+    stderr: 'inherit',
+    cwd: __dirname
+  });
 }
 
 function expectExists(path, exists) {

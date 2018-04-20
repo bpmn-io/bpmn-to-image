@@ -9,15 +9,37 @@
 
     <!-- example styles -->
     <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      }
+
       html, body, #canvas {
         height: 100%;
         padding: 0;
+        margin: 0;
+      }
+
+      .footer {
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+      }
+
+      #title {
+        font-size: .85em;
+        color: #AAA;
+        font-weight: normal;
+        padding: 5px 10px;
         margin: 0;
       }
     </style>
   </head>
   <body>
     <div id="canvas"></div>
+
+    <div class="footer">
+      <h4 id="title"></h4>
+    </div>
 
     <script>
 
@@ -48,16 +70,21 @@
        * Open diagram in our viewer instance.
        *
        * @param {String} bpmnXML diagram to display
-       * @param {Dimensions} [minDimensions]
+       * @param {Object} [options]
+       * @param {Dimensions} [options.minDimensions]
        *
        * @return {Promise<Bounds, Error>}
        */
-      function openDiagram(bpmnXML, minDimensions) {
+      function openDiagram(bpmnXML, options) {
 
-        minDimensions = minDimensions || {
+        options = options || {};
+
+        var minDimensions = options.minDimensions || {
           width: 0,
           height: 0
         };
+
+        var title = options.title;
 
         return new Promise(function(resolve, reject) {
           bpmnViewer.importXML(bpmnXML, function(err) {
@@ -67,6 +94,15 @@
             }
 
             var viewbox = canvas.viewbox();
+
+            // uses provided title
+            var titleNode = document.querySelector('#title');
+
+            if (title) {
+              titleNode.textContent = title;
+            }
+
+            titleNode.style.display = title ? 'block' : 'none';
 
             var desiredViewport = {
               width: Math.max(viewbox.inner.width, minDimensions.width),

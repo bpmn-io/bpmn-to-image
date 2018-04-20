@@ -9,6 +9,7 @@ ___Note:__ Yet to be released changes appear here._
 ## 0.2.0
 
 * `FEAT`: add minimum export dimensions, configurable via `--min-dimensions=<width>x<height>`
+* `FEAT`: add customizable title (on per default); disable via `--no-title` option
 
 ## 0.1.1
 
