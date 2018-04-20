@@ -15,7 +15,7 @@ describe('cli', function() {
   this.timeout(30000);
 
 
-  false && afterEach(async function() {
+  afterEach(async function() {
 
     await del([
       '*.png',
