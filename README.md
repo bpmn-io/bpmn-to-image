@@ -1,5 +1,7 @@
 # bpmn-to-image
 
+[![Build Status](https://travis-ci.org/bpmn-io/bpmn-to-image.svg?branch=master)](https://travis-ci.org/bpmn-io/bpmn-to-image)
+
 Convert [BPMN 2.0 diagrams](https://www.omg.org/spec/BPMN/2.0) to PDF documents or PNG files.
 
 
