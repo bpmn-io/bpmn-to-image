@@ -10,6 +10,7 @@ ___Note:__ Yet to be released changes appear here._
 
 * `FEAT`: add minimum export dimensions, configurable via `--min-dimensions=<width>x<height>`
 * `FEAT`: add customizable title (on per default); disable via `--no-title` option
+* `FEAT`: add ability to remove footer all together via the `--no-footer` option
 
 ## 0.1.1
 

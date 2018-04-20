@@ -16,6 +16,7 @@ async function printDiagram(page, options) {
     input,
     outputs,
     minDimensions,
+    footer,
     title
   } = options;
 
@@ -27,12 +28,13 @@ async function printDiagram(page, options) {
 
   await page.goto(`file://${__dirname}/skeleton.html`);
 
-  const desiredViewport = await page.evaluate((diagramXML, minDimensions, title) => {
-    return openDiagram(diagramXML, {
-      minDimensions,
-      title
-    });
-  }, diagramXML, minDimensions, diagramTitle);
+  const desiredViewport = await page.evaluate((diagramXML, options) => {
+    return openDiagram(diagramXML, options);
+  }, diagramXML, {
+    minDimensions,
+    title: diagramTitle,
+    footer
+  });;
 
   page.setViewport({
     width: desiredViewport.width,
@@ -51,7 +53,7 @@ async function printDiagram(page, options) {
       await page.pdf({
         path: output,
         width: desiredViewport.width,
-        height: desiredViewport.height
+        height: desiredViewport.diagramHeight
       });
     } else
 
@@ -62,7 +64,7 @@ async function printDiagram(page, options) {
           x: 0,
           y: 0,
           width: desiredViewport.width,
-          height: desiredViewport.height
+          height: desiredViewport.diagramHeight
         }
       });
     } else {
@@ -97,6 +99,7 @@ module.exports.convertAll = async function(conversions, options={}) {
 
   const {
     minDimensions,
+    footer,
     title
   } = options;
 
@@ -113,7 +116,8 @@ module.exports.convertAll = async function(conversions, options={}) {
         input,
         outputs,
         minDimensions,
-        title
+        title,
+        footer
       });
     }
 

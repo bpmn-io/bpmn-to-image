@@ -29,7 +29,7 @@
         font-size: .85em;
         color: #AAA;
         font-weight: normal;
-        padding: 5px 10px;
+        padding: 5px 0;
         margin: 0;
       }
     </style>
@@ -86,6 +86,8 @@
 
         var title = options.title;
 
+        var footer = options.footer;
+
         return new Promise(function(resolve, reject) {
           bpmnViewer.importXML(bpmnXML, function(err) {
 
@@ -104,9 +106,13 @@
 
             titleNode.style.display = title ? 'block' : 'none';
 
+            var width = Math.max(viewbox.inner.width, minDimensions.width);
+            var diagramHeight = Math.max(viewbox.inner.height + (footer ? 90 : 0), minDimensions.height);
+
             var desiredViewport = {
-              width: Math.max(viewbox.inner.width, minDimensions.width),
-              height: Math.max(viewbox.inner.height + 90, minDimensions.height)
+              width,
+              height: diagramHeight + (footer ? 0 : 90),
+              diagramHeight
             };
 
             return resolve(desiredViewport);

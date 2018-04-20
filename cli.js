@@ -24,6 +24,8 @@ const cli = meow(`
     --title=<title>                Add explicit <title> to exported image
     --no-title                     Don't display title on exported image
 
+    --no-footer                    Strip title and logo from image
+
 
   Examples
 
@@ -42,12 +44,10 @@ const cli = meow(`
       default: '400x300'
     },
     title: {
-      default: '',
-      type: 'string'
+      default: true
     },
-    noTitle: {
-      type: 'boolean',
-      default: false
+    footer: {
+      default: true
     }
   }
 });
@@ -80,8 +80,9 @@ const conversions = cli.input.map(function(conversion) {
   }
 });
 
+const footer = cli.flags.footer;
 
-const title = cli.flags.noTitle ? false : cli.flags.title;
+const title = cli.flags.title === false ? false : cli.flags.title;
 
 const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
   return parseInt(d, 10);
@@ -89,7 +90,8 @@ const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
 
 convertAll(conversions, {
   minDimensions: { width, height },
-  title
+  title,
+  footer
 }).catch(function(e) {
   console.error('failed to export diagram(s)');
   console.error(e);

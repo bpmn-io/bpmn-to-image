@@ -115,7 +115,7 @@ describe('cli', function() {
 
     describe('with title', function() {
 
-      it('from definitions', async function() {
+      it('from diagram name', async function() {
 
         // when
         await runExport([
@@ -156,6 +156,24 @@ describe('cli', function() {
 
     });
 
+
+    describe('without footer', function() {
+
+      it('explicit cli opt-out', async function() {
+
+        // when
+        await runExport([
+          `title.bpmn:no_footer.png`
+        ], {
+          noFooter: true
+        });
+
+        // then
+        expectExists(`${__dirname}/no_footer.png`, true);
+      });
+
+    });
+
   });
 
 });
@@ -168,8 +186,16 @@ async function runExport(conversions, options = {}) {
 
   const {
     minDimensions,
-    title
+    title,
+    noFooter
   } = options;
+
+  if (noFooter) {
+    args = [
+      ...args,
+      '--no-footer'
+    ];
+  }
 
   if (minDimensions) {
     args = [
