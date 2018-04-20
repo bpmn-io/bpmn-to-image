@@ -12,7 +12,7 @@ const execa = require('execa');
 describe('cli', function() {
 
   // tests may take some time
-  this.timeout(5000);
+  this.timeout(30000);
 
 
   false && afterEach(async function() {
