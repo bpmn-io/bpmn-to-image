@@ -86,11 +86,13 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `small.bpmn:small_default.png`
+          `small.bpmn:small_default.png`,
+          'vertical.bpmn:png'
         ]);
 
         // then
         expectExists(`${__dirname}/small_default.png`, true);
+        expectExists(`${__dirname}/vertical.png`, true);
       });
 
 
