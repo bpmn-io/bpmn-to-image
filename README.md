@@ -20,8 +20,16 @@ $ bpmn-to-image --help
 
   Options
 
-    diagramFile     Path to BPMN diagram
-    outputConfig    List of extension or output file paths
+    diagramFile                    Path to BPMN diagram
+    outputConfig                   List of extension or output file paths
+
+    --min-dimensions=<dimensions>  Minimum size in pixels (<width>x<height>)
+
+    --title=<title>                Add explicit <title> to exported image
+    --no-title                     Don't display title on exported image
+
+    --no-footer                    Strip title and logo from image
+
 
   Examples
 
@@ -30,6 +38,9 @@ $ bpmn-to-image --help
 
     # export diagram.png and /tmp/diagram.pdf
     $ bpmn-to-image diagram.bpmn:diagram.png,/tmp/diagram.pdf
+
+    # export with minimum size of 500x300 pixels
+    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn:png
 ```
 
 
