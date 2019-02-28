@@ -17,7 +17,7 @@ async function printDiagram(page, options) {
     outputs,
     minDimensions,
     footer,
-    title
+    title = true
   } = options;
 
   const diagramXML = readFileSync(input, 'utf8');
