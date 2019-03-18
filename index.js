@@ -95,7 +95,7 @@ async function withPage(fn) {
 }
 
 
-module.exports.convertAll = async function(conversions, options={}) {
+async function convertAll(conversions, options={}) {
 
   const {
     minDimensions,
@@ -123,12 +123,18 @@ module.exports.convertAll = async function(conversions, options={}) {
 
   });
 
-};
+}
+
+module.exports.convertAll = convertAll;
+
+async function convert(input, output) {
+  return await convertAll([
+    {
+      input,
+      outputs: [ output ]
+    }
+  ]);
+}
 
 
-module.exports.convert = async function(input, output) {
-  return await convertAll({
-    input,
-    outputs: [ output ]
-  });
-};
+module.exports.convert = convert;
