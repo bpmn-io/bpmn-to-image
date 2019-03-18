@@ -3,7 +3,8 @@ const { expect } = require('chai');
 const del = require('del');
 
 const {
-  join: joinPath
+  join: joinPath,
+  delimiter: pathDelimiter
 } = require('path');
 
 const {
@@ -48,7 +49,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `${ joinPath(__dirname, 'complex.bpmn') }:complex_export.pdf,complex_img.png`
+        `${ joinPath(__dirname, 'complex.bpmn') }${pathDelimiter}complex_export.pdf,complex_img.png`
       ]);
 
       // then
@@ -61,7 +62,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn:${ joinPath(__dirname, 'diagram_export.png') },pdf`
+        `diagram.bpmn${pathDelimiter}${ joinPath(__dirname, 'diagram_export.png') },pdf`
       ]);
 
       // then
