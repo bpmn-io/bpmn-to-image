@@ -6,6 +6,12 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+## 0.3.0
+
+* `FEAT`: use `bpmn-js@3` for rendering diagrams
+* `FEAT`: support `;` as an option delimiter on Windows
+* `FIX`: correct `#convertAll` not properly setting defaults
+
 ## 0.2.0
 
 * `FEAT`: add minimum export dimensions, configurable via `--min-dimensions=<width>x<height>`
