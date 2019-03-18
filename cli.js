@@ -55,10 +55,12 @@ const cli = meow(`
 
 const conversions = cli.input.map(function(conversion) {
 
+  const delimiter = conversion.includes(path.delimiter) ? path.delimiter : ':';
+
   const [
     input,
     output
-  ] = conversion.split(':');
+  ] = conversion.split(delimiter);
 
   const outputs = output.split(',').reduce(function(outputs, file, idx) {
 
