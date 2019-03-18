@@ -3,6 +3,10 @@ const { expect } = require('chai');
 const del = require('del');
 
 const {
+  join: joinPath
+} = require('path');
+
+const {
   accessSync
 } = require('fs');
 
@@ -35,8 +39,8 @@ describe('cli', function() {
       ]);
 
       // then
-      expectExists(`${__dirname}/diagram.pdf`, true);
-      expectExists(`${__dirname}/diagram.png`, false);
+      expectExists('diagram.pdf', true);
+      expectExists('diagram.png', false);
     });
 
 
@@ -44,12 +48,12 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `${__dirname}/complex.bpmn:complex_export.pdf,complex_img.png`
+        `${ joinPath(__dirname, 'complex.bpmn') }:complex_export.pdf,complex_img.png`
       ]);
 
       // then
-      expectExists(`${__dirname}/complex_export.pdf`, true);
-      expectExists(`${__dirname}/complex_img.png`, true);
+      expectExists('complex_export.pdf', true);
+      expectExists('complex_img.png', true);
     });
 
 
@@ -57,12 +61,12 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn:${__dirname}/diagram_export.png,pdf`
+        `diagram.bpmn:${ joinPath(__dirname, 'diagram_export.png') },pdf`
       ]);
 
       // then
-      expectExists(`${__dirname}/diagram_export.png`, true);
-      expectExists(`${__dirname}/diagram_export.pdf`, true);
+      expectExists('diagram_export.png', true);
+      expectExists('diagram_export.pdf', true);
     });
 
 
@@ -75,8 +79,8 @@ describe('cli', function() {
       ]);
 
       // then
-      expectExists(`${__dirname}/diagram.png`, true);
-      expectExists(`${__dirname}/complex.png`, true);
+      expectExists('diagram.png', true);
+      expectExists('complex.png', true);
     });
 
 
@@ -91,8 +95,8 @@ describe('cli', function() {
         ]);
 
         // then
-        expectExists(`${__dirname}/small_default.png`, true);
-        expectExists(`${__dirname}/vertical.png`, true);
+        expectExists('small_default.png', true);
+        expectExists('vertical.png', true);
       });
 
 
@@ -109,7 +113,7 @@ describe('cli', function() {
         });
 
         // then
-        expectExists(`${__dirname}/small_custom_size.png`, true);
+        expectExists('small_custom_size.png', true);
       });
 
     });
@@ -125,7 +129,7 @@ describe('cli', function() {
         ]);
 
         // then
-        expectExists(`${__dirname}/title_default.png`, true);
+        expectExists('title_default.png', true);
       });
 
 
@@ -139,7 +143,7 @@ describe('cli', function() {
         });
 
         // then
-        expectExists(`${__dirname}/custom_title.png`, true);
+        expectExists('custom_title.png', true);
       });
 
 
@@ -153,7 +157,7 @@ describe('cli', function() {
         });
 
         // then
-        expectExists(`${__dirname}/no_title.png`, true);
+        expectExists('no_title.png', true);
       });
 
     });
@@ -171,7 +175,7 @@ describe('cli', function() {
         });
 
         // then
-        expectExists(`${__dirname}/no_footer.png`, true);
+        expectExists('no_footer.png', true);
       });
 
     });
@@ -230,7 +234,10 @@ async function runExport(conversions, options = {}) {
   });
 }
 
-function expectExists(path, exists) {
+function expectExists(localPath, exists) {
+
+  const path = joinPath(__dirname, localPath);
+
   try {
     accessSync(path);
 
