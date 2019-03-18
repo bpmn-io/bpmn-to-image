@@ -1,8 +1,8 @@
 const { expect } = require('chai');
 
+const del = require('del');
+
 const {
-  mkdtempSync,
-  rmdirSync,
   accessSync
 } = require('fs');
 
@@ -25,15 +25,15 @@ describe('index', function() {
   // tests may take some time
   this.timeout(10000);
 
-  let dir;
 
-  beforeEach(function() {
-    dir = mkdtempSync('index-spec');
+  process.env.NO_CLEANUP || afterEach(async function() {
+
+    await del([
+      '*.png',
+      '*.pdf'
+    ], { cwd: __dirname });
+
   });
-
-  afterEach(function() {
-    rmdirSync(dir);
-  })
 
 
   describe('#convertAll', function() {
