@@ -4,10 +4,8 @@
     <meta charset="UTF-8" />
     <title>Diagram Viewer</title>
 
-    <!-- viewer distro -->
-    <script src="node_modules/bpmn-js/dist/bpmn-viewer.production.min.js"></script>
+    <!-- bpmn-js script is injected via loadScript -->
 
-    <!-- example styles -->
     <style>
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -42,29 +40,39 @@
     </div>
 
     <script>
+      // viewer instance, lazily initialized
+      var bpmnViewer;
 
-      // viewer instance
-      var bpmnViewer = new BpmnJS({
-        container: '#canvas'
-      });
+      /**
+       * Get or create viewer instance.
+       *
+       * @return {BpmnViewer}
+       */
+      function getViewer() {
 
-      // access viewer components
-      var canvas = bpmnViewer.get('canvas');
-
-
-      bpmnViewer.on('import.done', function(event) {
-
-        var error = event.error;
-        var warnings = event.warnings;
-
-        if (error) {
-          return console.error('could not import BPMN 2.0 diagram', error);
+        if (bpmnViewer) {
+          return bpmnViewer;
         }
 
-        // zoom to fit full viewport
-        canvas.zoom('fit-viewport');
-      });
+        bpmnViewer = new BpmnJS({
+          container: '#canvas'
+        });
 
+        bpmnViewer.on('import.done', function(event) {
+
+          var error = event.error;
+          var warnings = event.warnings;
+
+          if (error) {
+            return console.error('could not import BPMN 2.0 diagram', error);
+          }
+
+          // zoom to fit full viewport
+          bpmnViewer.get('canvas').zoom('fit-viewport');
+        });
+
+        return bpmnViewer;
+      }
 
       /**
        * Open diagram in our viewer instance.
@@ -76,6 +84,9 @@
        * @return {Promise<Bounds, Error>}
        */
       function openDiagram(bpmnXML, options) {
+
+        // viewer instance, lazily initialized
+        const bpmnViewer = getViewer();
 
         options = options || {};
 
@@ -95,7 +106,7 @@
               return reject(err);
             }
 
-            var viewbox = canvas.viewbox();
+            var viewbox = bpmnViewer.get('canvas').viewbox();
 
             // uses provided title
             var titleNode = document.querySelector('#title');
@@ -120,7 +131,14 @@
         });
       }
 
+      /**
+       * Resize to viewport
+       */
       function resize() {
+        const bpmnViewer = getViewer();
+
+        var canvas = bpmnViewer.get('canvas');
+
         return new Promise(function(resolve, reject) {
           canvas.resized();
 
@@ -128,6 +146,39 @@
 
           return resolve();
         });
+      }
+
+      /**
+       * Load the script that provides the BpmnJS global
+       *
+       * @param  {String} src
+       *
+       * @return {Promise<Void>}
+       */
+      function loadScript(src) {
+        var head = document.head;
+        var script = document.createElement('script');
+
+        script.type = 'text/javascript';
+        script.charset = 'utf8';
+        script.src = src;
+
+        const promise = new Promise((resolve, reject) => {
+
+          function callback(fn) {
+            return (arg) => {
+              script.onload = script.onerror = null;
+              return fn(arg);
+            };
+          }
+
+          script.onload = callback(resolve);
+          script.onerror = callback(reject);
+        });
+
+        head.appendChild(script);
+
+        return promise;
       }
     </script>
   </body>

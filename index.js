@@ -2,7 +2,8 @@ const puppeteer = require('puppeteer');
 
 const {
   basename,
-  resolve
+  resolve,
+  relative
 } = require('path');
 
 const {
@@ -28,11 +29,23 @@ async function printDiagram(page, options) {
 
   await page.goto(`file://${__dirname}/skeleton.html`);
 
-  const desiredViewport = await page.evaluate((diagramXML, options) => {
-    return openDiagram(diagramXML, options);
+  const viewerScript = relative(__dirname, require.resolve('bpmn-js/dist/bpmn-viewer.production.min.js'));
+
+  const desiredViewport = await page.evaluate(async function(diagramXML, options) {
+
+    const {
+      viewerScript,
+      ...openOptions
+    } = options;
+
+    await loadScript(viewerScript);
+
+    // returns desired viewport
+    return openDiagram(diagramXML, openOptions);
   }, diagramXML, {
     minDimensions,
     title: diagramTitle,
+    viewerScript,
     footer
   });;
 
