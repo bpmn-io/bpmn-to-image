@@ -70,7 +70,7 @@ This renders the BPMN diagram using [bpmn-js](https://github.com/bpmn-io/bpmn-js
 ## Install
 
 ```bash
-npm install -g bpmn-to-image
+npm install -g bpmn-to-image --unsafe-perm=true
 ```
 
 
