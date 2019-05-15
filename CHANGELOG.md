@@ -6,6 +6,10 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+## 0.3.2
+
+* `CHORE`: adjust error handling in cli
+
 ## 0.3.1
 
 * `FIX`: include `bpmn-js` from correct location ([#5](https://github.com/bpmn-io/bpmn-to-image/issues/5))
