@@ -148,6 +148,21 @@
         });
       }
 
+      function toSVG() {
+        const bpmnViewer = getViewer();
+
+        return new Promise(function(resolve, reject) {
+          bpmnViewer.saveSVG(function(err, svg) {
+
+            if (err) {
+              reject(err);
+            } else {
+              resolve(svg);
+            }
+          });
+        });
+      }
+
       /**
        * Load the script that provides the BpmnJS global
        *

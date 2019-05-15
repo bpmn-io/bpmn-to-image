@@ -1,7 +1,7 @@
 {
   "name": "bpmn-to-image",
   "version": "0.3.3",
-  "description": "Convert a BPMN 2.0 diagrams to PDF or PNG images",
+  "description": "Convert a BPMN 2.0 diagrams to PDF, SVG or PNG images",
   "main": "index.js",
   "bin": {
     "bpmn-to-image": "./cli.js"
@@ -22,7 +22,8 @@
     "converter",
     "cli",
     "pdf",
-    "png"
+    "png",
+    "svg"
   ],
   "author": "Nico Rehwaldt <https://github.com/nikku>",
   "license": "MIT",

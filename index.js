@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 const {
   basename,
@@ -69,7 +70,6 @@ async function printDiagram(page, options) {
         height: desiredViewport.diagramHeight
       });
     } else
-
     if (output.endsWith('.png')) {
       await page.screenshot({
         path: output,
@@ -80,6 +80,14 @@ async function printDiagram(page, options) {
           height: desiredViewport.diagramHeight
         }
       });
+    } else
+    if (output.endsWith('.svg')) {
+
+      const svg = await page.evaluate(() => {
+        return toSVG();
+      });
+
+      fs.writeFileSync(output, svg, 'utf8');
     } else {
       console.error(`Unknown output file format: ${output}`);
     }
