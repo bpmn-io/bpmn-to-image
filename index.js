@@ -50,8 +50,8 @@ async function printDiagram(page, options) {
   });;
 
   page.setViewport({
-    width: desiredViewport.width,
-    height: desiredViewport.height
+    width: Math.round(desiredViewport.width),
+    height: Math.round(desiredViewport.height)
   });
 
   await page.evaluate(() => {
