@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/bpmn-io/bpmn-to-image.svg?branch=master)](https://travis-ci.org/bpmn-io/bpmn-to-image)
 
-Convert [BPMN 2.0 diagrams](https://www.omg.org/spec/BPMN/2.0) to PDF documents or PNG files.
+Convert [BPMN 2.0 diagrams](https://www.omg.org/spec/BPMN/2.0) to PDF documents, SVG or PNG files.
 
 
 ## Usage
@@ -36,8 +36,8 @@ $ bpmn-to-image --help
     # export to diagram.png
     $ bpmn-to-image diagram.bpmn:diagram.png
 
-    # export diagram.png and /tmp/diagram.pdf
-    $ bpmn-to-image diagram.bpmn:diagram.png,/tmp/diagram.pdf
+    # export diagram.png, diagram.svg and /tmp/diagram.pdf
+    $ bpmn-to-image diagram.bpmn:diagram.png,diagram.svg,/tmp/diagram.pdf
 
     # export with minimum size of 500x300 pixels
     $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn:png
@@ -59,6 +59,7 @@ await convertAll([
     outputs: [
       'diagram.pdf',
       'diagram.png'
+      'diagram.svg'
     ]
   }
 ]);

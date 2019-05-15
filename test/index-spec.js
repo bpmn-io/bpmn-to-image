@@ -18,6 +18,7 @@ const input = path.join(__dirname, 'diagram.bpmn');
 
 const outputPNG = path.join(__dirname, 'diagram.png');
 const outputPDF = path.join(__dirname, 'diagram.pdf');
+const outputSVG = path.join(__dirname, 'diagram.svg');
 
 
 describe('index', function() {
@@ -44,13 +45,14 @@ describe('index', function() {
       await convertAll([
         {
           input,
-          outputs: [ outputPNG, outputPDF ]
+          outputs: [ outputPNG, outputPDF, outputSVG ]
         }
       ]);
 
       // then
       expectExists(outputPNG, true);
       expectExists(outputPDF, true);
+      expectExists(outputSVG, true);
     });
 
   });

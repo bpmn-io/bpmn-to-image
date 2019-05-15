@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 const {
   basename,
@@ -69,7 +70,6 @@ async function printDiagram(page, options) {
         height: desiredViewport.diagramHeight
       });
     } else
-
     if (output.endsWith('.png')) {
       await page.screenshot({
         path: output,
@@ -79,6 +79,17 @@ async function printDiagram(page, options) {
           width: desiredViewport.width,
           height: desiredViewport.diagramHeight
         }
+      });
+    } else
+    if (output.endsWith('.svg')) {
+      bpmnViewer = new BpmnJS({
+        container: '#canvas'
+      });
+
+      bpmnJS.importXML(someXML);
+
+      bpmnJS.saveSVG(function(err, svg) {
+        fs.writeFileSync(output, svg);
       });
     } else {
       console.error(`Unknown output file format: ${output}`);
