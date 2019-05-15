@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 
 const meow = require('meow');
-
 const path = require('path');
+const {
+  join: joinPath,
+  delimiter: pathDelimiter
+} = path;
+const chalk = require('chalk');
+
+const error = chalk.bold.red;
 
 const {
   convertAll
@@ -12,7 +18,7 @@ const {
 const cli = meow(`
   Usage
 
-    $ bpmn-to-image <diagramFile>:<outputConfig> ...
+    $ bpmn-to-image <diagramFile>${pathDelimiter}<outputConfig> ...
 
   Options
 
@@ -30,13 +36,13 @@ const cli = meow(`
   Examples
 
     # export to diagram.png
-    $ bpmn-to-image diagram.bpmn:diagram.png
+    $ bpmn-to-image diagram.bpmn${pathDelimiter}diagram.png
 
     # export diagram.png and /tmp/diagram.pdf
-    $ bpmn-to-image diagram.bpmn:diagram.png,/tmp/diagram.pdf
+    $ bpmn-to-image diagram.bpmn${pathDelimiter}diagram.png,/tmp/diagram.pdf
 
     # export with minimum size of 500x300 pixels
-    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn:png
+    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn${pathDelimiter}png
 `, {
   flags: {
     minDimensions: {
@@ -52,15 +58,21 @@ const cli = meow(`
   }
 });
 
+if (cli.input.length == 0)
+  cli.showHelp(1);
 
 const conversions = cli.input.map(function(conversion) {
 
-  const delimiter = conversion.includes(path.delimiter) ? path.delimiter : ':';
+  const hasDelimiter = conversion.includes(pathDelimiter);
+  if (!hasDelimiter) {
+     console.error(error(`  Error: no <diagramFile>${pathDelimiter}<outputConfig> param provided`));
+     cli.showHelp(1);
+  }
 
   const [
     input,
     output
-  ] = conversion.split(delimiter);
+  ] = conversion.split(pathDelimiter);
 
   const outputs = output.split(',').reduce(function(outputs, file, idx) {
 
