@@ -6,6 +6,10 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+# 0.3.3
+
+* `FIX`: enforce integer value on setting viewport ([#10](https://github.com/bpmn-io/bpmn-to-image/issues/10))
+
 ## 0.3.2
 
 * `CHORE`: adjust error handling in cli
