@@ -6,7 +6,11 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
-# 0.3.3
+## 0.4.0
+
+* `FEAT`: add ability to export diagram as SVG ([#9](https://github.com/bpmn-io/bpmn-to-image/pull/9))
+
+## 0.3.3
 
 * `FIX`: enforce integer value on setting viewport ([#10](https://github.com/bpmn-io/bpmn-to-image/issues/10))
 
