@@ -29,7 +29,7 @@ $ bpmn-to-image --help
     --no-title                     Don't display title on exported image
 
     --no-footer                    Strip title and logo from image
-
+    --scale                        Scale factor for images (1)
 
   Examples
 
