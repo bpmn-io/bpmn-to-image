@@ -107,7 +107,6 @@ const scale = cli.flags.scale !== undefined ? cli.flags.scale : 1;
 const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
   return parseInt(d, 10);
 });
-console.info(cli.flags)
 convertAll(conversions, {
   minDimensions: { width, height },
   title,
