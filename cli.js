@@ -32,6 +32,7 @@ const cli = meow(`
 
     --no-footer                    Strip title and logo from image
 
+    --scale                        Scale factor for images (1)
 
   Examples
 
@@ -54,6 +55,9 @@ const cli = meow(`
     },
     footer: {
       default: true
+    },
+    scale: {
+      default: 1
     }
   }
 });
@@ -98,14 +102,16 @@ const footer = cli.flags.footer;
 
 const title = cli.flags.title === false ? false : cli.flags.title;
 
+const scale = cli.flags.scale !== undefined ? cli.flags.scale : 1;
+
 const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
   return parseInt(d, 10);
 });
-
 convertAll(conversions, {
   minDimensions: { width, height },
   title,
-  footer
+  footer,
+  deviceScaleFactor: scale
 }).catch(function(e) {
   console.error('failed to export diagram(s)');
   console.error(e);
