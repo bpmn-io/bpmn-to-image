@@ -19,7 +19,8 @@ async function printDiagram(page, options) {
     outputs,
     minDimensions,
     footer,
-    title = true
+    title = true,
+    deviceScaleFactor
   } = options;
 
   const diagramXML = readFileSync(input, 'utf8');
@@ -52,7 +53,8 @@ async function printDiagram(page, options) {
 
   page.setViewport({
     width: Math.round(desiredViewport.width),
-    height: Math.round(desiredViewport.height)
+    height: Math.round(desiredViewport.height),
+    deviceScaleFactor: deviceScaleFactor
   });
 
   await page.evaluate(() => {
@@ -121,7 +123,8 @@ async function convertAll(conversions, options={}) {
   const {
     minDimensions,
     footer,
-    title
+    title,
+    deviceScaleFactor
   } = options;
 
   await withPage(async function(page) {
@@ -138,7 +141,8 @@ async function convertAll(conversions, options={}) {
         outputs,
         minDimensions,
         title,
-        footer
+        footer,
+        deviceScaleFactor
       });
     }
 
