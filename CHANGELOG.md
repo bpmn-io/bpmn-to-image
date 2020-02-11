@@ -6,6 +6,10 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+## 0.5.1
+
+* `CHORE`: do not publish dev assets
+
 ## 0.5.0
 
 * `FEAT`: add `--scale` option to specify image scale factor
