@@ -181,6 +181,23 @@ describe('cli', function() {
 
     });
 
+
+    describe('with custom scale factor', function() {
+
+      it('explicit cli opt-out', async function() {
+
+        // when
+        await runExport([
+          `title.bpmn${pathDelimiter}scaled.png`
+        ], {
+          scale: 0.5
+        });
+
+        // then
+        expectExists('scaled.png', true);
+      });
+
+    });
   });
 
 });
@@ -194,7 +211,8 @@ async function runExport(conversions, options = {}) {
   const {
     minDimensions,
     title,
-    noFooter
+    noFooter,
+    scale
   } = options;
 
   if (noFooter) {
@@ -210,6 +228,13 @@ async function runExport(conversions, options = {}) {
       `--min-dimensions=${minDimensions.width}x${minDimensions.height}`
     ]
   };
+
+  if (typeof scale !== 'undefined') {
+    args = [
+      ...args,
+      `--scale=${scale}`
+    ]
+  }
 
   if (typeof title !== 'undefined') {
 
