@@ -6,6 +6,11 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+## 0.5.0
+
+* `FEAT`: add `--scale` option to specify image scale factor
+* `CHORE`: update to `bpmn-js@6.3.0`
+
 ## 0.4.0
 
 * `FEAT`: add ability to export diagram as SVG ([#9](https://github.com/bpmn-io/bpmn-to-image/pull/9))
