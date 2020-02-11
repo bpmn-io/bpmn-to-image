@@ -25,7 +25,7 @@
     "png",
     "svg"
   ],
-  "author": "Nico Rehwaldt <https://github.com/nikku>, Ruslan Gainutdinov <https://github.com/huksley>",
+  "author": "Nico Rehwaldt <https://github.com/nikku>",
   "license": "MIT",
   "dependencies": {
     "bpmn-js": "^6.2.0",
