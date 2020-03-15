@@ -4,7 +4,6 @@ const del = require('del');
 
 const {
   join: joinPath,
-  delimiter: pathDelimiter
 } = require('path');
 
 const {
