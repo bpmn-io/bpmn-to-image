@@ -65,7 +65,7 @@ const cli = meow(`
   }
 });
 
-if (cli.input.length == 0)
+if (cli.input.length == 0 || !cli.flags.destination)
   cli.showHelp(1);
 
 const conversion = (function(conversion) {

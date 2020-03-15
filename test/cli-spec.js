@@ -29,6 +29,25 @@ describe('cli', function() {
 
   });
 
+  describe('missing destination', function () {
+    it('prints instruction', async function () {
+
+      // when
+      runExport([
+        'diagram.bpmn'
+      ]).then(
+        function (result) {},
+        function (error) {
+          expect(error).to.exist;
+        }
+      )
+
+      // then
+      expectExists('diagram.pdf', false);
+      expectExists('diagram.png', false);
+      expectExists('diagram.svg', false);
+    });
+  });
 
   describe('should export images', function() {
 
