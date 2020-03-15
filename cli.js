@@ -18,7 +18,7 @@ const {
 const cli = meow(`
   Usage
 
-    $ bpmn-to-image <diagramFile>${pathDelimiter}<outputConfig> ...
+    $ bpmn-to-image --destination=<outputConfig> <diagramFile>
 
   Options
 
@@ -37,13 +37,13 @@ const cli = meow(`
   Examples
 
     # export to diagram.png
-    $ bpmn-to-image diagram.bpmn${pathDelimiter}diagram.png
+    $ bpmn-to-image --destination=diagram.png diagram.bpmn
 
     # export diagram.png and /tmp/diagram.pdf
-    $ bpmn-to-image diagram.bpmn${pathDelimiter}diagram.png,/tmp/diagram.pdf
+    $ bpmn-to-image --destination=diagram.png,/tmp/diagram.pdf diagram.bpmn
 
     # export with minimum size of 500x300 pixels
-    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn${pathDelimiter}png
+    $ bpmn-to-image --min-dimensions=500x300 --destination=diagram.png diagram.bpmn
 `, {
   flags: {
     minDimensions: {
@@ -58,6 +58,9 @@ const cli = meow(`
     },
     scale: {
       default: 1
+    },
+    destination: {
+      type: 'string'
     }
   }
 });
@@ -65,19 +68,9 @@ const cli = meow(`
 if (cli.input.length == 0)
   cli.showHelp(1);
 
-const conversions = cli.input.map(function(conversion) {
-
-  const hasDelimiter = conversion.includes(pathDelimiter);
-  if (!hasDelimiter) {
-     console.error(error(`  Error: no <diagramFile>${pathDelimiter}<outputConfig> param provided`));
-     cli.showHelp(1);
-  }
-
-  const [
-    input,
-    output
-  ] = conversion.split(pathDelimiter);
-
+const conversion = (function(conversion) {
+  const input = conversion;
+  const output = cli.flags.destination;
   const outputs = output.split(',').reduce(function(outputs, file, idx) {
 
     // just extension
@@ -96,7 +89,7 @@ const conversions = cli.input.map(function(conversion) {
     input,
     outputs
   }
-});
+})(cli.input[0])
 
 const footer = cli.flags.footer;
 
@@ -107,7 +100,8 @@ const scale = cli.flags.scale !== undefined ? cli.flags.scale : 1;
 const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
   return parseInt(d, 10);
 });
-convertAll(conversions, {
+
+convertAll([conversion], {
   minDimensions: { width, height },
   title,
   footer,

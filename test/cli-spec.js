@@ -36,7 +36,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn${pathDelimiter}pdf`
+        '--destination=pdf', 'diagram.bpmn'
       ]);
 
       // then
@@ -49,7 +49,8 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `${ joinPath(__dirname, 'complex.bpmn') }${pathDelimiter}complex_export.pdf,complex_img.png`
+        '--destination=complex_export.pdf,complex_img.png',
+        `${ joinPath(__dirname, 'complex.bpmn') }`
       ]);
 
       // then
@@ -62,26 +63,13 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn${pathDelimiter}${ joinPath(__dirname, 'diagram_export.png') },pdf`
+        `--destination=${ joinPath(__dirname, 'diagram_export.png') },pdf`,
+        'diagram.bpmn'
       ]);
 
       // then
       expectExists('diagram_export.png', true);
       expectExists('diagram_export.pdf', true);
-    });
-
-
-    it('multiple files', async function() {
-
-      // when
-      await runExport([
-        `diagram.bpmn${pathDelimiter}png`,
-        `complex.bpmn${pathDelimiter}png`
-      ]);
-
-      // then
-      expectExists('diagram.png', true);
-      expectExists('complex.png', true);
     });
 
 
@@ -91,12 +79,10 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `small.bpmn${pathDelimiter}small_default.png`,
-          `vertical.bpmn${pathDelimiter}png`
+          '--destination=png', 'vertical.bpmn'
         ]);
 
         // then
-        expectExists('small_default.png', true);
         expectExists('vertical.png', true);
       });
 
@@ -105,7 +91,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `small.bpmn${pathDelimiter}small_custom_size.png`
+          '--destination=small_custom_size.png', 'small.bpmn'
         ], {
           minDimensions: {
             width: 500,
@@ -126,7 +112,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}title_default.png`
+          '--destination=title_default.png', 'title.bpmn'
         ]);
 
         // then
@@ -138,7 +124,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}custom_title.png`
+          '--destination=custom_title.png', 'title.bpmn'
         ], {
           title: 'FOO BAR'
         });
@@ -152,7 +138,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}no_title.png`
+          '--destination=no_title.png', 'title.bpmn'
         ], {
           title: false
         });
@@ -170,7 +156,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}no_footer.png`
+          '--destination=no_footer.png', 'title.bpmn'
         ], {
           noFooter: true
         });
@@ -188,7 +174,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}scaled.png`
+          '--destination=scaled.png', 'title.bpmn'
         ], {
           scale: 0.5
         });
