@@ -62,8 +62,9 @@ const cli = meow(`
   }
 });
 
-if (cli.input.length == 0)
+if (cli.input.length === 0) {
   cli.showHelp(1);
+}
 
 const conversions = cli.input.map(function(conversion) {
 
@@ -107,6 +108,7 @@ const scale = cli.flags.scale !== undefined ? cli.flags.scale : 1;
 const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
   return parseInt(d, 10);
 });
+
 convertAll(conversions, {
   minDimensions: { width, height },
   title,
