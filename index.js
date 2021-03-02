@@ -98,12 +98,7 @@ async function withPage(fn) {
   let browser;
 
   try {
-    browser = await puppeteer.launch({
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ]
-    });
+    browser = await puppeteer.launch();
 
     await fn(await browser.newPage());
   } finally {
