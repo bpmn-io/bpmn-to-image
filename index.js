@@ -57,9 +57,7 @@ async function printDiagram(page, options) {
     deviceScaleFactor: deviceScaleFactor
   });
 
-  await page.evaluate(() => {
-    return resize();
-  });
+  await page.evaluate(() => resize());
 
   for (const output of outputs) {
 
@@ -85,9 +83,7 @@ async function printDiagram(page, options) {
     } else
     if (output.endsWith('.svg')) {
 
-      const svg = await page.evaluate(() => {
-        return toSVG();
-      });
+      const svg = await page.evaluate(() => toSVG());
 
       fs.writeFileSync(output, svg, 'utf8');
     } else {
