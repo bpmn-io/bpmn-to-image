@@ -6,6 +6,12 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+## 0.6.0
+
+* `CHORE`: run without sandbox ([#14](https://github.com/bpmn-io/bpmn-to-image/issues/14))
+* `DEPS`: update to `bpmn-js@8`
+* `DEPS`: update to `puppeteer@8`
+
 ## 0.5.1
 
 * `CHORE`: do not publish dev assets
