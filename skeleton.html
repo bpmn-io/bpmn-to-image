@@ -41,7 +41,7 @@
 
     <script>
       // viewer instance, lazily initialized
-      var bpmnViewer;
+      let bpmnViewer;
 
       /**
        * Get or create viewer instance.
@@ -60,8 +60,8 @@
 
         bpmnViewer.on('import.done', function(event) {
 
-          var error = event.error;
-          var warnings = event.warnings;
+          const error = event.error;
+          const warnings = event.warnings;
 
           if (error) {
             return console.error('could not import BPMN 2.0 diagram', error);
@@ -83,84 +83,69 @@
        *
        * @return {Promise<Bounds, Error>}
        */
-      function openDiagram(bpmnXML, options) {
+      async function openDiagram(bpmnXML, options) {
 
         // viewer instance, lazily initialized
         const bpmnViewer = getViewer();
 
         options = options || {};
 
-        var minDimensions = options.minDimensions || {
+        const minDimensions = options.minDimensions || {
           width: 0,
           height: 0
         };
 
-        var title = options.title;
+        const title = options.title;
 
-        var footer = options.footer;
+        const footer = options.footer;
 
-        return new Promise(function(resolve, reject) {
-          bpmnViewer.importXML(bpmnXML, function(err) {
+        await bpmnViewer.importXML(bpmnXML);
 
-            if (err) {
-              return reject(err);
-            }
+        const viewbox = bpmnViewer.get('canvas').viewbox();
 
-            var viewbox = bpmnViewer.get('canvas').viewbox();
+        // uses provided title
+        const titleNode = document.querySelector('#title');
 
-            // uses provided title
-            var titleNode = document.querySelector('#title');
+        if (title) {
+          titleNode.textContent = title;
+        }
 
-            if (title) {
-              titleNode.textContent = title;
-            }
+        titleNode.style.display = title ? 'block' : 'none';
 
-            titleNode.style.display = title ? 'block' : 'none';
+        const width = Math.max(viewbox.inner.width, minDimensions.width);
+        const diagramHeight = Math.max(
+          viewbox.inner.height + (footer ? 90 : 0),
+          minDimensions.height
+        );
 
-            var width = Math.max(viewbox.inner.width, minDimensions.width);
-            var diagramHeight = Math.max(viewbox.inner.height + (footer ? 90 : 0), minDimensions.height);
-
-            var desiredViewport = {
-              width,
-              height: diagramHeight + (footer ? 0 : 90),
-              diagramHeight
-            };
-
-            return resolve(desiredViewport);
-          });
-        });
+        return {
+          width,
+          height: diagramHeight + (footer ? 0 : 90),
+          diagramHeight
+        };
       }
 
       /**
        * Resize to viewport
        */
-      function resize() {
+      async function resize() {
         const bpmnViewer = getViewer();
 
-        var canvas = bpmnViewer.get('canvas');
+        const canvas = bpmnViewer.get('canvas');
 
-        return new Promise(function(resolve, reject) {
-          canvas.resized();
+        canvas.resized();
 
-          canvas.zoom('fit-viewport');
-
-          return resolve();
-        });
+        canvas.zoom('fit-viewport');
       }
 
-      function toSVG() {
+      async function toSVG() {
         const bpmnViewer = getViewer();
 
-        return new Promise(function(resolve, reject) {
-          bpmnViewer.saveSVG(function(err, svg) {
+        const {
+          svg
+        } = await bpmnViewer.saveSVG();
 
-            if (err) {
-              reject(err);
-            } else {
-              resolve(svg);
-            }
-          });
-        });
+        return svg;
       }
 
       /**
@@ -171,8 +156,8 @@
        * @return {Promise<Void>}
        */
       function loadScript(src) {
-        var head = document.head;
-        var script = document.createElement('script');
+        const head = document.head;
+        const script = document.createElement('script');
 
         script.type = 'text/javascript';
         script.charset = 'utf8';
