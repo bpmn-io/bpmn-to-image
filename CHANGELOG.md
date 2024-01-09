@@ -6,6 +6,11 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+## 0.7.0
+
+* `DEPS`: update to `puppeteer@21`
+* `DEPS`: update to `bpmn-js@16`
+
 ## 0.6.1
 
 * `FIX`: allow installation on M1 Apples ([#23](https://github.com/bpmn-io/bpmn-to-image/pull/23))
