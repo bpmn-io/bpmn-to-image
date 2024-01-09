@@ -98,7 +98,9 @@ async function withPage(fn) {
   let browser;
 
   try {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({
+      headless: 'new'
+    });
 
     await fn(await browser.newPage());
   } finally {
