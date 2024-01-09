@@ -31,7 +31,8 @@ describe('index', function() {
 
     await del([
       '*.png',
-      '*.pdf'
+      '*.pdf',
+      '*.svg'
     ], { cwd: __dirname });
 
   });
