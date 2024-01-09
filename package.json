@@ -1,6 +1,6 @@
 {
   "name": "bpmn-to-image",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Convert a BPMN 2.0 diagrams to PDF, SVG or PNG images",
   "main": "index.js",
   "bin": {
