@@ -28,7 +28,7 @@
   "author": "Nico Rehwaldt <https://github.com/nikku>",
   "license": "MIT",
   "dependencies": {
-    "bpmn-js": "^16.3.1",
+    "bpmn-js": "^17.0.0",
     "chalk": "^4.1.2",
     "meow": "^4.0.0",
     "puppeteer": "^22.0.0"
