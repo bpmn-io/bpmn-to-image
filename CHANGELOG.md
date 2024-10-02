@@ -6,6 +6,13 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+## 0.8.0
+
+* `DEPS`: update to `puppeteer@23`
+* `DEPS`: update to `bpmn-js@17`
+* `CHORE`: replace dependency `npm-run-all` with `npm-run-all2@6`
+* `DEPS`: update to `chalk@4`
+
 ## 0.7.0
 
 * `DEPS`: update to `puppeteer@21`
