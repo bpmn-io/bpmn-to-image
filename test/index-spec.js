@@ -1,7 +1,5 @@
 const { expect } = require('chai');
 
-const del = require('del').deleteAsync;
-
 const {
   accessSync
 } = require('fs');
@@ -88,4 +86,10 @@ function expectExists(path, exists) {
 
     expect(false).to.equal(exists, `expected ${ path } to exist`);
   }
+}
+
+async function del(...args) {
+  const deleteAsync = (await import('del')).deleteAsync;
+
+  return deleteAsync(...args);
 }
