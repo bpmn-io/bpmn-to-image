@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const del = require('del');
+const del = require('del').deleteAsync;
 
 const {
   accessSync
