@@ -38,7 +38,7 @@
     "del": "^8.0.0",
     "execa": "^0.10.0",
     "mocha": "^10.2.0",
-    "npm-run-all2": "^6.0.0"
+    "npm-run-all2": "^7.0.0"
   },
   "files": [
     "cli.js",
