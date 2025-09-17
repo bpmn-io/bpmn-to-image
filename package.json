@@ -30,7 +30,7 @@
   "dependencies": {
     "bpmn-js": "^18.0.0",
     "chalk": "^4.1.2",
-    "meow": "^4.0.0",
+    "meow": "^14.0.0",
     "puppeteer": "^24.0.0"
   },
   "devDependencies": {
