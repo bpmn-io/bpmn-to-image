@@ -34,10 +34,10 @@
     "puppeteer": "^24.0.0"
   },
   "devDependencies": {
-    "chai": "^4.5.0",
+    "chai": "^6.0.0",
     "del": "^8.0.0",
     "execa": "^0.10.0",
-    "mocha": "^10.8.2",
+    "mocha": "^11.0.0",
     "npm-run-all2": "^8.0.0"
   },
   "files": [
