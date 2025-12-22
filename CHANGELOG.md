@@ -6,6 +6,15 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
+## 0.10.0
+
+* `FIX`: parse `scale` as number
+* `CHORE`: migrate to ES module
+* `DEPS`: update to `chalk@5.6.2`
+* `DEPS`: update to `meow@14.0.0`
+* `DEPS`: update to `puppeteer@24.34.0`
+* `DEPS`: update to `bpmn-js@18.9.1`
+
 ## 0.9.0
 
 * `DEPS`: update to `bpmn-js@18`
