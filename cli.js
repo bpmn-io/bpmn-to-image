@@ -103,7 +103,13 @@ const footer = cli.flags.footer;
 
 const title = cli.flags.title === false ? false : cli.flags.title;
 
-const scale = cli.flags.scale !== undefined ? cli.flags.scale : 1;
+const scale = cli.flags.scale !== undefined ? parseFloat(cli.flags.scale) : 1;
+
+if (isNaN(scale)) {
+  console.error('<scale> is not a number');
+
+  process.exit(1);
+}
 
 const [ width, height ] = cli.flags.minDimensions.split('x').map(function(d) {
   return parseInt(d, 10);
