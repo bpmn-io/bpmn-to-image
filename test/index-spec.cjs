@@ -2,21 +2,23 @@ const { expect } = require('chai');
 
 const {
   accessSync
-} = require('fs');
+} = require('node:fs');
 
-const path = require('path');
+const {
+  join: pathJoin
+} = require('node:path');
 
 const {
   convertAll,
   convert
-} = require('..');
+} = require('bpmn-to-image');
 
 
-const input = path.join(__dirname, 'diagram.bpmn');
+const input = pathJoin(__dirname, 'diagram.bpmn');
 
-const outputPNG = path.join(__dirname, 'diagram.png');
-const outputPDF = path.join(__dirname, 'diagram.pdf');
-const outputSVG = path.join(__dirname, 'diagram.svg');
+const outputPNG = pathJoin(__dirname, 'diagram.png');
+const outputPDF = pathJoin(__dirname, 'diagram.pdf');
+const outputSVG = pathJoin(__dirname, 'diagram.svg');
 
 
 describe('index', function() {

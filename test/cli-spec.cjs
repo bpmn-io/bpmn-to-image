@@ -3,11 +3,11 @@ const { expect } = require('chai');
 const {
   join: joinPath,
   delimiter: pathDelimiter
-} = require('path');
+} = require('node:path');
 
 const {
   accessSync
-} = require('fs');
+} = require('node:fs');
 
 const execa = require('execa');
 
@@ -188,7 +188,7 @@ describe('cli', function() {
         await runExport([
           `title.bpmn${pathDelimiter}scaled.png`
         ], {
-          scale: 0.5
+          scale: 0.6
         });
 
         // then

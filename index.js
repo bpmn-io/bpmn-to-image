@@ -1,15 +1,13 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
+import puppeteer from 'puppeteer';
 
-const {
+import {
   basename,
-  resolve,
-  relative
-} = require('path');
+} from 'node:path';
 
-const {
-  readFileSync
-} = require('fs');
+import {
+  readFileSync,
+  writeFileSync
+} from 'node:fs';
 
 
 async function printDiagram(page, options) {
@@ -29,9 +27,9 @@ async function printDiagram(page, options) {
     title.length ? title : basename(input)
   );
 
-  await page.goto(`file://${__dirname}/skeleton.html`);
+  await page.goto(new URL('./skeleton.html', import.meta.url));
 
-  const viewerScript = relative(__dirname, require.resolve('bpmn-js/dist/bpmn-viewer.production.min.js'));
+  const viewerScript = import.meta.resolve('bpmn-js/dist/bpmn-viewer.production.min.js');
 
   const desiredViewport = await page.evaluate(async function(diagramXML, options) {
 
@@ -85,7 +83,7 @@ async function printDiagram(page, options) {
 
       const svg = await page.evaluate(() => toSVG());
 
-      fs.writeFileSync(output, svg, 'utf8');
+      writeFileSync(output, svg, 'utf8');
     } else {
       console.error(`Unknown output file format: ${output}`);
     }
@@ -111,7 +109,7 @@ async function withPage(fn) {
 }
 
 
-async function convertAll(conversions, options={}) {
+export async function convertAll(conversions, options={}) {
 
   const {
     minDimensions,
@@ -143,9 +141,7 @@ async function convertAll(conversions, options={}) {
 
 }
 
-module.exports.convertAll = convertAll;
-
-async function convert(input, output) {
+export async function convert(input, output) {
   return await convertAll([
     {
       input,
@@ -153,6 +149,3 @@ async function convert(input, output) {
     }
   ]);
 }
-
-
-module.exports.convert = convert;
