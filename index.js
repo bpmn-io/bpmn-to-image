@@ -10,6 +10,15 @@ import {
 } from 'node:fs';
 
 
+/** @typedef { import('puppeteer').Page } Page */
+/** @typedef { PrintOptions } any */
+
+/**
+ * @param { Page } page
+ * @param { PrintOptions } options
+ *
+ * @return {Promise<void>}
+ */
 async function printDiagram(page, options) {
 
   const {
@@ -52,7 +61,7 @@ async function printDiagram(page, options) {
   page.setViewport({
     width: Math.round(desiredViewport.width),
     height: Math.round(desiredViewport.height),
-    deviceScaleFactor: deviceScaleFactor
+    deviceScaleFactor
   });
 
   await page.evaluate(() => resize());
