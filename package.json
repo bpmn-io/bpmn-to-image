@@ -41,7 +41,7 @@
   "devDependencies": {
     "chai": "^6.0.0",
     "del": "^8.0.1",
-    "execa": "^0.10.0",
+    "execa": "^9.6.1",
     "mocha": "^11.0.0",
     "npm-run-all2": "^8.0.4"
   },

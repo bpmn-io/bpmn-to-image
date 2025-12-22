@@ -9,7 +9,7 @@ const {
   accessSync
 } = require('node:fs');
 
-const execa = require('execa');
+const { execa } = require('execa');
 
 
 describe('cli', function() {
