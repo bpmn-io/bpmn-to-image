@@ -1,18 +1,17 @@
 #!/usr/bin/env node
 
-const meow = require('meow');
-const path = require('path');
-const {
-  join: joinPath,
-  delimiter: pathDelimiter
-} = path;
-const chalk = require('chalk');
+import {
+  join as joinPath,
+  delimiter as pathDelimiter,
+  basename
+} from 'node:path';
 
-const error = chalk.bold.red;
+import meow from 'meow';
+import chalk from 'chalk';
 
-const {
+import {
   convertAll
-} = require('./');
+} from 'bpmn-to-image';
 
 
 const cli = meow(`
@@ -45,6 +44,7 @@ const cli = meow(`
     # export with minimum size of 500x300 pixels
     $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn${pathDelimiter}png
 `, {
+  importMeta: import.meta,
   flags: {
     minDimensions: {
       type: 'string',
@@ -70,7 +70,7 @@ const conversions = cli.input.map(function(conversion) {
 
   const hasDelimiter = conversion.includes(pathDelimiter);
   if (!hasDelimiter) {
-     console.error(error(`  Error: no <diagramFile>${pathDelimiter}<outputConfig> param provided`));
+     console.error(chalk.bold.red(`  Error: no <diagramFile>${pathDelimiter}<outputConfig> param provided`));
      cli.showHelp(1);
   }
 
@@ -83,7 +83,7 @@ const conversions = cli.input.map(function(conversion) {
 
     // just extension
     if (file.indexOf('.') === -1) {
-      const baseName = path.basename(idx === 0 ? input : outputs[idx - 1]);
+      const baseName = basename(idx === 0 ? input : outputs[idx - 1]);
 
       const name = baseName.substring(0, baseName.lastIndexOf('.'));
 
