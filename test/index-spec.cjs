@@ -31,7 +31,7 @@ const { PDFDocument } = require('pdf-lib');
 describe('index', function() {
 
   // tests may take some time
-  this.timeout(20000);
+  this.timeout(30000);
 
 
   process.env.NO_CLEANUP || afterEach(async function() {
@@ -126,7 +126,51 @@ describe('index', function() {
       const pdfDoc = await PDFDocument.load(pdfBuffer);
 
       // Expect at least main + some subdiagrams
-      expect(pdfDoc.getPageCount()).to.be.greaterThanOrEqual(1);
+      expect(pdfDoc.getPageCount()).to.equal(5);
+    });
+
+  });
+
+
+  describe('ignoring sub diagrams', function() {
+
+    it('should export only main diagram as PNG when subDiagrams option is not set', async function() {
+
+      // when
+      await convertAll([
+        {
+          input: subdiagramInput,
+          outputs: [ pathJoin(__dirname, 'subdiagrams-no-subs.png') ]
+        }
+      ]);
+
+      // then
+      expectExists(pathJoin(__dirname, 'subdiagrams-no-subs.png'), true);
+      expectExists(pathJoin(__dirname, 'subdiagrams-no-subs-1utzm6g.png'), false);
+      expectExists(pathJoin(__dirname, 'subdiagrams-no-subs-1k00b0l.png'), false);
+      expectExists(pathJoin(__dirname, 'subdiagrams-no-subs-173ua2j.png'), false);
+      expectExists(pathJoin(__dirname, 'subdiagrams-no-subs-1elvc1o.png'), false);
+    });
+
+
+    it('should export only main diagram as PDF when subDiagrams option is not set', async function() {
+
+      // when
+      await convertAll([
+        {
+          input: subdiagramInput,
+          outputs: [ pathJoin(__dirname, 'subdiagrams-no-subs-main.pdf') ]
+        }
+      ]);
+
+      // then
+      expectExists(pathJoin(__dirname, 'subdiagrams-no-subs-main.pdf'), true);
+
+      const pdfBuffer = readFileSync(pathJoin(__dirname, 'subdiagrams-no-subs-main.pdf'));
+
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+      expect(pdfDoc.getPageCount()).to.equal(1);
     });
 
   });

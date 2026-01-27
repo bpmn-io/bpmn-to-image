@@ -1,25 +1,21 @@
 const { expect } = require('chai');
+
 const {
   join: joinPath,
   delimiter: pathDelimiter
 } = require('node:path');
+
 const {
   accessSync,
   readFileSync
 } = require('node:fs');
+
 const { execa } = require('execa');
 const { PDFDocument } = require('pdf-lib');
-
-const input = joinPath(__dirname, 'diagram.bpmn');
-
-const outputPNG = joinPath(__dirname, 'diagram.png');
-const outputPDF = joinPath(__dirname, 'diagram.pdf');
-const outputSVG = joinPath(__dirname, 'diagram.svg');
 
 const subdiagramInput = joinPath(__dirname, 'subdiagrams.bpmn');
 const subdiagramPNG = joinPath(__dirname, 'subdiagrams.png');
 const subdiagramPDF = joinPath(__dirname, 'subdiagrams.pdf');
-
 
 describe('cli', function() {
 
@@ -240,6 +236,39 @@ describe('cli', function() {
       const pdfDoc = await PDFDocument.load(pdfBuffer);
 
       expect(pdfDoc.getPageCount()).to.equal(5);
+    });
+
+  });
+
+
+  describe('ignoring sub diagrams', function() {
+
+    it('should export only main diagram as PNG when subDiagrams flag is not set', async function() {
+
+      await runExport([
+        `${ subdiagramInput }${pathDelimiter}subdiagrams-no-subs.png`
+      ]);
+
+      expectExists('subdiagrams-no-subs.png', true);
+      expectExists('subdiagrams-no-subs-1utzm6g.png', false);
+      expectExists('subdiagrams-no-subs-1k00b0l.png', false);
+      expectExists('subdiagrams-no-subs-173ua2j.png', false);
+      expectExists('subdiagrams-no-subs-1elvc1o.png', false);
+    });
+
+
+    it('should export only main diagram as PDF when subDiagrams flag is not set', async function() {
+
+      await runExport([
+        `${ subdiagramInput }${pathDelimiter}subdiagrams-no-subs.pdf`
+      ]);
+
+      expectExists('subdiagrams-no-subs.pdf', true);
+
+      const pdfBuffer = readFileSync(joinPath(__dirname, 'subdiagrams-no-subs.pdf'));
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+      expect(pdfDoc.getPageCount()).to.equal(1);
     });
 
   });
