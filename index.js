@@ -44,12 +44,12 @@ async function printDiagram(page, options) {
 
   const diagrams = await page.evaluate(async function(diagramXML, options) {
 
-    const { viewerScript } = options;
+    const { viewerScript, subDiagrams } = options;
 
     await loadScript(viewerScript);
 
-    return computeExportPlan(diagramXML);
-  }, diagramXML, { viewerScript });
+    return computeExportPlan(diagramXML, { subDiagrams });
+  }, diagramXML, { viewerScript, subDiagrams });
 
   if (!diagrams.length) {
     throw new Error('no BPMN diagrams found in input');
