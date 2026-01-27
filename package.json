@@ -36,6 +36,7 @@
     "bpmn-js": "^18.9.1",
     "chalk": "^5.6.2",
     "meow": "^14.0.0",
+    "pdf-lib": "^1.17.1",
     "puppeteer": "^24.34.0"
   },
   "devDependencies": {

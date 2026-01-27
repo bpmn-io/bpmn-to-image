@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { PDFDocument } from 'pdf-lib';
 
 import {
   basename,
@@ -27,75 +28,125 @@ async function printDiagram(page, options) {
     minDimensions,
     footer,
     title = true,
-    deviceScaleFactor
+    deviceScaleFactor,
+    subDiagrams = false
   } = options;
 
   const diagramXML = readFileSync(input, 'utf8');
 
   const diagramTitle = title === false ? false : (
-    title.length ? title : basename(input)
+    (typeof title === 'string' && title.length) ? title : basename(input)
   );
 
   await page.goto(new URL('./skeleton.html', import.meta.url));
 
   const viewerScript = import.meta.resolve('bpmn-js/dist/bpmn-viewer.production.min.js');
 
-  const desiredViewport = await page.evaluate(async function(diagramXML, options) {
+  const diagrams = await page.evaluate(async function(diagramXML, options) {
 
     const {
-      viewerScript,
-      ...openOptions
+      viewerScript
     } = options;
 
     await loadScript(viewerScript);
 
-    // returns desired viewport
-    return openDiagram(diagramXML, openOptions);
+    return importDiagram(diagramXML);
   }, diagramXML, {
-    minDimensions,
-    title: diagramTitle,
-    viewerScript,
-    footer
-  });;
-
-  page.setViewport({
-    width: Math.round(desiredViewport.width),
-    height: Math.round(desiredViewport.height),
-    deviceScaleFactor
+    viewerScript
   });
 
-  await page.evaluate(() => resize());
+  if (!diagrams.length) {
+    throw new Error('no BPMN diagrams found in input');
+  }
 
-  for (const output of outputs) {
+  const diagramsToExport = [ diagrams[0] ];
+
+  if (subDiagrams) {
+    diagramsToExport.push(
+      ...diagrams.filter(function(diagram) {
+        return diagram.isSubProcess && diagram.isCollapsed;
+      })
+    );
+  }
+
+  const pdfOutputs = outputs.filter(o => o.endsWith('.pdf'));
+  const otherOutputs = outputs.filter(o => !o.endsWith('.pdf'));
+
+  const pdfBuffers = new Map(pdfOutputs.map(o => [ o, [] ]));
+
+  for (let diagramIndex = 0; diagramIndex < diagramsToExport.length; diagramIndex++) {
+
+    const diagram = diagramsToExport[diagramIndex];
+
+    const diagramSpecificTitle = diagramIndex === 0 || !diagramTitle
+      ? diagramTitle
+      : `${diagramTitle} – ${diagram.name || diagram.elementId}`;
+
+    const desiredViewport = await page.evaluate(async function(diagramId, openOptions) {
+      return openAndCompute(diagramId, openOptions);
+    }, diagram.id, {
+      minDimensions,
+      title: diagramSpecificTitle,
+      footer
+    });
+
+    page.setViewport({
+      width: Math.round(desiredViewport.width),
+      height: Math.round(desiredViewport.height),
+      deviceScaleFactor
+    });
+
+    await page.evaluate(() => resize());
+
+    for (const output of otherOutputs) {
+
+      const targetOutput = diagramIndex === 0 ? output : addSuffix(output, `-sub${diagramIndex}`);
+
+      console.log(`writing ${targetOutput}`);
+
+      if (output.endsWith('.png')) {
+        await page.screenshot({
+          path: targetOutput,
+          clip: {
+            x: 0,
+            y: 0,
+            width: desiredViewport.width,
+            height: desiredViewport.diagramHeight
+          }
+        });
+      } else
+      if (output.endsWith('.svg')) {
+
+        const svg = await page.evaluate(() => toSVG());
+
+        writeFileSync(targetOutput, svg, 'utf8');
+      } else {
+        console.error(`Unknown output file format: ${output}`);
+      }
+    }
+
+    for (const output of pdfOutputs) {
+      const buffer = await page.pdf({
+        width: desiredViewport.width,
+        height: desiredViewport.diagramHeight,
+        printBackground: true
+      });
+
+      pdfBuffers.get(output).push(buffer);
+    }
+  }
+
+  for (const [ output, buffers ] of pdfBuffers.entries()) {
+
+    if (!buffers.length) {
+      continue;
+    }
 
     console.log(`writing ${output}`);
 
-    if (output.endsWith('.pdf')) {
-      await page.pdf({
-        path: output,
-        width: desiredViewport.width,
-        height: desiredViewport.diagramHeight
-      });
-    } else
-    if (output.endsWith('.png')) {
-      await page.screenshot({
-        path: output,
-        clip: {
-          x: 0,
-          y: 0,
-          width: desiredViewport.width,
-          height: desiredViewport.diagramHeight
-        }
-      });
-    } else
-    if (output.endsWith('.svg')) {
+    const merged = await mergePdf(buffers);
 
-      const svg = await page.evaluate(() => toSVG());
-
-      writeFileSync(output, svg, 'utf8');
-    } else {
-      console.error(`Unknown output file format: ${output}`);
-    }
+    writeFileSync(output, merged);
   }
 
 }
@@ -124,7 +175,8 @@ export async function convertAll(conversions, options={}) {
     minDimensions,
     footer,
     title,
-    deviceScaleFactor
+    deviceScaleFactor,
+    subDiagrams
   } = options;
 
   await withPage(async function(page) {
@@ -142,7 +194,8 @@ export async function convertAll(conversions, options={}) {
         minDimensions,
         title,
         footer,
-        deviceScaleFactor
+        deviceScaleFactor,
+        subDiagrams
       });
     }
 
@@ -157,4 +210,43 @@ export async function convert(input, output) {
       outputs: [ output ]
     }
   ]);
+}
+
+/**
+ * Add a suffix before the file extension.
+ *
+ * @param {string} filePath
+ * @param {string} suffix
+ * @return {string}
+ */
+function addSuffix(filePath, suffix) {
+
+  const lastDot = filePath.lastIndexOf('.');
+
+  if (lastDot === -1) {
+    return `${filePath}${suffix}`;
+  }
+
+  return `${filePath.substring(0, lastDot)}${suffix}${filePath.substring(lastDot)}`;
+}
+
+/**
+ * Merge multiple PDF buffers into a single document.
+ *
+ * @param {Array<Uint8Array>} buffers
+ * @return {Promise<Uint8Array>}
+ */
+async function mergePdf(buffers) {
+
+  const mergedPdf = await PDFDocument.create();
+
+  for (const buffer of buffers) {
+    const doc = await PDFDocument.load(buffer);
+
+    const copiedPages = await mergedPdf.copyPages(doc, doc.getPageIndices());
+
+    copiedPages.forEach(page => mergedPdf.addPage(page));
+  }
+
+  return mergedPdf.save();
 }

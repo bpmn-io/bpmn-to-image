@@ -32,6 +32,10 @@ $ bpmn-to-image --help
 
     --scale                        Scale factor for images (1)
 
+    --subdiagrams                  Export collapsed sub-process diagrams too
+
+  When enabled, PDF outputs include one page per collapsed sub-process, and PNG/SVG outputs produce additional files suffixed with `-sub1`, `-sub2`, ...
+
   Examples
 
     # export to diagram.png

@@ -75,17 +75,109 @@
       }
 
       /**
-       * Open diagram in our viewer instance.
+       * Update footer title visibility and text.
        *
-       * @param {String} bpmnXML diagram to display
+       * @param {string|boolean} title
+       */
+      function setTitle(title) {
+        const titleNode = document.querySelector('#title');
+
+        if (title) {
+          titleNode.textContent = title;
+        }
+
+        titleNode.style.display = title ? 'block' : 'none';
+      }
+
+      /**
+       * Return all BPMN diagrams known to the current viewer.
+       *
+       * @return {Array<{ id: string, name: string, elementId: string, isCollapsed: boolean, isSubProcess: boolean, isDefault: boolean }>}
+       */
+      function listDiagrams() {
+        if (!bpmnViewer) {
+          return [];
+        }
+
+        const definitions = bpmnViewer.getDefinitions();
+
+        const diagrams = definitions && definitions.diagrams || [];
+
+        return diagrams.map(function(diagram, idx) {
+
+          const bpmnElement = diagram.plane && diagram.plane.bpmnElement;
+
+          const elementRegistry = bpmnViewer.get('elementRegistry');
+
+          const diagramElement = elementRegistry && bpmnElement && elementRegistry.get(bpmnElement.id);
+
+          const di = diagramElement && diagramElement.di;
+
+          return {
+            id: diagram.id,
+            name: bpmnElement && bpmnElement.name,
+            elementId: bpmnElement && bpmnElement.id,
+            isCollapsed: di && di.isExpanded === false,
+            isSubProcess: bpmnElement && bpmnElement.$type === 'bpmn:SubProcess',
+            isDefault: idx === 0
+          };
+        });
+      }
+
+      /**
+       * Import XML into the viewer and return diagram metadata.
+       *
+       * @param {string} bpmnXML
+       * @return {Promise<Array>}
+       */
+      async function importDiagram(bpmnXML) {
+
+        const bpmnViewer = getViewer();
+
+        await bpmnViewer.importXML(bpmnXML);
+
+        return listDiagrams();
+      }
+
+      /**
+       * Open a diagram by its BPMNDiagram id.
+       *
+       * @param {string} diagramId
+       * @return {Promise<void>}
+       */
+      async function openDiagramById(diagramId) {
+
+        const bpmnViewer = getViewer();
+
+        const diagrams = listDiagrams();
+
+        const diagram = diagrams.map(d => d.id).includes(diagramId)
+          ? bpmnViewer.getDefinitions().diagrams.find(d => d.id === diagramId)
+          : bpmnViewer.getDefinitions().diagrams[0];
+
+        if (!diagram) {
+          throw new Error('no diagram found');
+        }
+
+        if (typeof bpmnViewer.open === 'function') {
+          await bpmnViewer.open(diagram);
+        } else {
+          const canvas = bpmnViewer.get('canvas');
+
+          canvas.setRootElement(diagram.plane.bpmnElement, diagram.plane);
+        }
+      }
+
+      /**
+       * Get viewport for the currently opened diagram.
+       *
        * @param {Object} [options]
        * @param {Dimensions} [options.minDimensions]
        *
        * @return {Promise<Bounds, Error>}
        */
-      async function openDiagram(bpmnXML, options) {
+      async function computeViewport(options) {
 
-        // viewer instance, lazily initialized
         const bpmnViewer = getViewer();
 
         options = options || {};
@@ -99,18 +191,9 @@
 
         const footer = options.footer;
 
-        await bpmnViewer.importXML(bpmnXML);
+        setTitle(title);
 
         const viewbox = bpmnViewer.get('canvas').viewbox();
-
-        // uses provided title
-        const titleNode = document.querySelector('#title');
-
-        if (title) {
-          titleNode.textContent = title;
-        }
-
-        titleNode.style.display = title ? 'block' : 'none';
 
         const width = Math.max(viewbox.inner.width, minDimensions.width);
         const diagramHeight = Math.max(
@@ -123,6 +206,40 @@
           height: diagramHeight + (footer ? 0 : 90),
           diagramHeight
         };
+      }
+
+      /**
+       * Open a diagram by id and compute its viewport bounds.
+       *
+       * @param {string} diagramId
+       * @param {Object} [options]
+       * @return {Promise<Bounds>}
+       */
+      async function openAndCompute(diagramId, options) {
+
+        await openDiagramById(diagramId);
+
+        await resize();
+
+        return computeViewport(options);
+      }
+
+      /**
+       * Open diagram in our viewer instance.
+       *
+       * @param {String} bpmnXML diagram to display
+       * @param {Object} [options]
+       * @param {Dimensions} [options.minDimensions]
+       *
+       * @return {Promise<Bounds, Error>}
+       */
+      async function openDiagram(bpmnXML, options) {
+
+        const diagrams = await importDiagram(bpmnXML);
+
+        const targetId = options && options.diagramId || (diagrams[0] && diagrams[0].id);
+
+        return openAndCompute(targetId, options);
       }
 
       /**

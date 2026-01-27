@@ -33,6 +33,8 @@ const cli = meow(`
 
     --scale                        Scale factor for images (1)
 
+    --subdiagrams                  Export collapsed sub-process diagrams too
+
   Examples
 
     # export to diagram.png
@@ -58,6 +60,10 @@ const cli = meow(`
     },
     scale: {
       default: 1
+    },
+    subdiagrams: {
+      type: 'boolean',
+      default: false
     }
   }
 });
@@ -105,6 +111,8 @@ const title = cli.flags.title === false ? false : cli.flags.title;
 
 const scale = cli.flags.scale !== undefined ? parseFloat(cli.flags.scale) : 1;
 
+const subDiagrams = !!cli.flags.subdiagrams;
+
 if (isNaN(scale)) {
   console.error('<scale> is not a number');
 
@@ -119,7 +127,8 @@ convertAll(conversions, {
   minDimensions: { width, height },
   title,
   footer,
-  deviceScaleFactor: scale
+  deviceScaleFactor: scale,
+  subDiagrams
 }).catch(function(e) {
   console.error('failed to export diagram(s)');
   console.error(e);
