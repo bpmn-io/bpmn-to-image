@@ -117,7 +117,7 @@
             id: diagram.id,
             name: bpmnElement && bpmnElement.name,
             elementId: bpmnElement && bpmnElement.id,
-            isCollapsed: di && di.isExpanded === false,
+            isCollapsed: diagramElement && diagramElement.collapsed === true,
             isSubProcess: bpmnElement && bpmnElement.$type === 'bpmn:SubProcess',
             isDefault: idx === 0
           };
@@ -166,6 +166,99 @@
 
           canvas.setRootElement(diagram.plane.bpmnElement, diagram.plane);
         }
+      }
+
+      /**
+       * Collect collapsed subprocess shapes in the current diagram.
+       *
+       * @return {Array<{ id: string, name: string }>}
+       */
+      function getCollapsedSubprocessShapes() {
+        const bpmnViewer = getViewer();
+
+        const elementRegistry = bpmnViewer.get('elementRegistry');
+
+        const collapsed = [];
+
+        elementRegistry.forEach(function(element) {
+          const bo = element.businessObject;
+
+          if (!bo || bo.$type !== 'bpmn:SubProcess') {
+            return;
+          }
+
+          // Check if subprocess is collapsed
+          if (element.collapsed === true) {
+            collapsed.push({
+              id: bo.id,
+              name: bo.name || bo.id
+            });
+          }
+        });
+
+        return collapsed;
+      }
+
+      /**
+       * Build export plan: main diagram plus collapsed subprocess diagrams (alphabetically by name).
+       * Skips already visited elementIds to avoid cycles.
+       *
+       * @param {string} bpmnXML
+       * @return {Promise<Array<{ id: string, name: string, elementId: string }>>}
+       */
+      async function computeExportPlan(bpmnXML) {
+        const diagrams = await importDiagram(bpmnXML);
+
+        const main = diagrams[0];
+
+        const byElementId = {};
+
+        diagrams.forEach(function(diagram) {
+          if (diagram.elementId) {
+            byElementId[diagram.elementId] = diagram;
+          }
+        });
+
+        const plan = [];
+        const visited = new Set();
+
+        // Start with main diagram
+        plan.push({ id: main.id, name: main.name, elementId: main.elementId });
+        visited.add(main.elementId);
+
+        // Open main and collect collapsed subprocesses
+        await openDiagramById(main.id);
+        const collapsed = getCollapsedSubprocessShapes();
+
+        // Add collapsed subprocesses, sorted by name
+        const subdiagramsToAdd = [];
+
+        for (let i = 0; i < collapsed.length; i++) {
+          const child = collapsed[i];
+
+          // Skip if already visited (cycle detection)
+          if (visited.has(child.id)) {
+            continue;
+          }
+
+          const childDiagram = byElementId[child.id];
+
+          if (!childDiagram) {
+            continue;
+          }
+
+          subdiagramsToAdd.push({ id: childDiagram.id, name: child.name, elementId: child.id });
+          visited.add(child.id);
+        }
+
+        // Sort by name for alphabetical ordering in PDF
+        subdiagramsToAdd.sort(function(a, b) {
+          return (a.name || '').localeCompare(b.name || '');
+        });
+
+        plan.push(...subdiagramsToAdd);
+
+        return plan;
       }
 
       /**

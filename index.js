@@ -44,29 +44,15 @@ async function printDiagram(page, options) {
 
   const diagrams = await page.evaluate(async function(diagramXML, options) {
 
-    const {
-      viewerScript
-    } = options;
+    const { viewerScript } = options;
 
     await loadScript(viewerScript);
 
-    return importDiagram(diagramXML);
-  }, diagramXML, {
-    viewerScript
-  });
+    return computeExportPlan(diagramXML);
+  }, diagramXML, { viewerScript });
 
   if (!diagrams.length) {
     throw new Error('no BPMN diagrams found in input');
-  }
-
-  const diagramsToExport = [ diagrams[0] ];
-
-  if (subDiagrams) {
-    diagramsToExport.push(
-      ...diagrams.filter(function(diagram) {
-        return diagram.isSubProcess && diagram.isCollapsed;
-      })
-    );
   }
 
   const pdfOutputs = outputs.filter(o => o.endsWith('.pdf'));
@@ -74,17 +60,17 @@ async function printDiagram(page, options) {
 
   const pdfBuffers = new Map(pdfOutputs.map(o => [ o, [] ]));
 
-  for (let diagramIndex = 0; diagramIndex < diagramsToExport.length; diagramIndex++) {
+  for (let i = 0; i < diagrams.length; i++) {
 
-    const diagram = diagramsToExport[diagramIndex];
+    const { id: diagramId, name, elementId } = diagrams[i];
 
-    const diagramSpecificTitle = diagramIndex === 0 || !diagramTitle
+    const diagramSpecificTitle = (i === 0 || !diagramTitle)
       ? diagramTitle
-      : `${diagramTitle} – ${diagram.name || diagram.elementId}`;
+      : `${diagramTitle} – ${name || diagramId}`;
 
     const desiredViewport = await page.evaluate(async function(diagramId, openOptions) {
       return openAndCompute(diagramId, openOptions);
-    }, diagram.id, {
+    }, diagramId, {
       minDimensions,
       title: diagramSpecificTitle,
       footer
@@ -100,7 +86,13 @@ async function printDiagram(page, options) {
 
     for (const output of otherOutputs) {
 
-      const targetOutput = diagramIndex === 0 ? output : addSuffix(output, `-sub${diagramIndex}`);
+      const cleanId = cleanElementId(elementId);
+
+      const suffix = (cleanId && i > 0)
+        ? `-${cleanId}`
+        : '';
+
+      const targetOutput = suffix ? addSuffix(output, suffix) : output;
 
       console.log(`writing ${targetOutput}`);
 
@@ -210,6 +202,25 @@ export async function convert(input, output) {
       outputs: [ output ]
     }
   ]);
+}
+
+/**
+ * Clean BPMN element ids for filename use.
+ * Strips common prefixes such as "Activity_" while keeping the remainder intact.
+ *
+ * @param {string} elementId
+ * @return {string}
+ */
+function cleanElementId(elementId) {
+  if (!elementId) {
+    return '';
+  }
+
+  if (elementId.startsWith('Activity_')) {
+    return elementId.substring('Activity_'.length);
+  }
+
+  return elementId;
 }
 
 /**
