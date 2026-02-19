@@ -111,11 +111,17 @@
 
           const diagramElement = elementRegistry && bpmnElement && elementRegistry.get(bpmnElement.id);
 
+          const di = bpmnElement && bpmnElement.di;
+
+          const isCollapsed = diagramElement
+            ? diagramElement.collapsed === true
+            : di && di.isExpanded === false;
+
           return {
             id: diagram.id,
             name: bpmnElement && bpmnElement.name,
             elementId: bpmnElement && bpmnElement.id,
-            isCollapsed: diagramElement && diagramElement.collapsed === true,
+            isCollapsed,
             isSubProcess: bpmnElement && bpmnElement.$type === 'bpmn:SubProcess'
           };
         });

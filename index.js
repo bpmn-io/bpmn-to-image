@@ -76,7 +76,7 @@ async function printDiagram(page, options) {
       footer
     });
 
-    page.setViewport({
+    await page.setViewport({
       width: Math.round(desiredViewport.width),
       height: Math.round(desiredViewport.height),
       deviceScaleFactor
