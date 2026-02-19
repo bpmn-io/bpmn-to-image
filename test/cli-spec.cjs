@@ -6,11 +6,16 @@ const {
 } = require('node:path');
 
 const {
-  accessSync
+  accessSync,
+  readFileSync
 } = require('node:fs');
 
 const { execa } = require('execa');
+const { PDFDocument } = require('pdf-lib');
 
+const subdiagramInput = joinPath(__dirname, 'subdiagrams.bpmn');
+const subdiagramPNG = joinPath(__dirname, 'subdiagrams.png');
+const subdiagramPDF = joinPath(__dirname, 'subdiagrams.pdf');
 
 describe('cli', function() {
 
@@ -198,6 +203,76 @@ describe('cli', function() {
     });
   });
 
+
+  describe('with sub diagrams', function() {
+
+    it('should export collapsed sub processes as separate images', async function() {
+
+      await runExport([
+        `${ subdiagramInput }${pathDelimiter}${ subdiagramPNG }`
+      ], {
+        subDiagrams: true
+      });
+
+      expectExists('subdiagrams.png', true);
+      expectExists('subdiagrams-1utzm6g.png', true);
+      expectExists('subdiagrams-1k00b0l.png', true);
+      expectExists('subdiagrams-173ua2j.png', true);
+      expectExists('subdiagrams-1elvc1o.png', true);
+    });
+
+
+    it('should merge all diagrams into a single PDF', async function() {
+
+      await runExport([
+        `${ subdiagramInput }${pathDelimiter}${ subdiagramPDF }`
+      ], {
+        subDiagrams: true
+      });
+
+      expectExists('subdiagrams.pdf', true);
+
+      const pdfBuffer = readFileSync(subdiagramPDF);
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+      expect(pdfDoc.getPageCount()).to.equal(5);
+    });
+
+  });
+
+
+  describe('ignoring sub diagrams', function() {
+
+    it('should export only main diagram as PNG when subDiagrams flag is not set', async function() {
+
+      await runExport([
+        `${ subdiagramInput }${pathDelimiter}subdiagrams-no-subs.png`
+      ]);
+
+      expectExists('subdiagrams-no-subs.png', true);
+      expectExists('subdiagrams-no-subs-1utzm6g.png', false);
+      expectExists('subdiagrams-no-subs-1k00b0l.png', false);
+      expectExists('subdiagrams-no-subs-173ua2j.png', false);
+      expectExists('subdiagrams-no-subs-1elvc1o.png', false);
+    });
+
+
+    it('should export only main diagram as PDF when subDiagrams flag is not set', async function() {
+
+      await runExport([
+        `${ subdiagramInput }${pathDelimiter}subdiagrams-no-subs.pdf`
+      ]);
+
+      expectExists('subdiagrams-no-subs.pdf', true);
+
+      const pdfBuffer = readFileSync(joinPath(__dirname, 'subdiagrams-no-subs.pdf'));
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+      expect(pdfDoc.getPageCount()).to.equal(1);
+    });
+
+  });
+
 });
 
 
@@ -210,7 +285,8 @@ async function runExport(conversions, options = {}) {
     minDimensions,
     title,
     noFooter,
-    scale
+    scale,
+    subDiagrams
   } = options;
 
   if (noFooter) {
@@ -249,6 +325,13 @@ async function runExport(conversions, options = {}) {
         `--title=${title}`
       ];
     }
+  }
+
+  if (subDiagrams) {
+    args = [
+      ...args,
+      '--subdiagrams'
+    ];
   }
 
   await execa('../cli.js', args, {
