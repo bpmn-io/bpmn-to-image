@@ -2,7 +2,6 @@
 
 import {
   join as joinPath,
-  delimiter as pathDelimiter,
   basename
 } from 'node:path';
 
@@ -13,6 +12,7 @@ import {
   convertAll
 } from 'bpmn-to-image';
 
+pathDelimiter = ":"
 
 const cli = meow(`
   Usage
