@@ -1,8 +1,7 @@
 const { expect } = require('chai');
 
 const {
-  join: joinPath,
-  delimiter: pathDelimiter
+  join: joinPath
 } = require('node:path');
 
 const {
@@ -11,6 +10,7 @@ const {
 
 const { execa } = require('execa');
 
+const conversionDelimiter = ':';
 
 describe('cli', function() {
 
@@ -34,7 +34,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn${pathDelimiter}pdf`
+        `diagram.bpmn${conversionDelimiter}pdf`
       ]);
 
       // then
@@ -47,7 +47,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `${ joinPath(__dirname, 'complex.bpmn') }${pathDelimiter}complex_export.pdf,complex_img.png`
+        `${ joinPath(__dirname, 'complex.bpmn') }${conversionDelimiter}complex_export.pdf,complex_img.png`
       ]);
 
       // then
@@ -60,7 +60,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn${pathDelimiter}${ joinPath(__dirname, 'diagram_export.png') },pdf`
+        `diagram.bpmn${conversionDelimiter}${ joinPath(__dirname, 'diagram_export.png') },pdf`
       ]);
 
       // then
@@ -73,8 +73,8 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn${pathDelimiter}png`,
-        `complex.bpmn${pathDelimiter}png`
+        `diagram.bpmn${conversionDelimiter}png`,
+        `complex.bpmn${conversionDelimiter}png`
       ]);
 
       // then
@@ -89,8 +89,8 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `small.bpmn${pathDelimiter}small_default.png`,
-          `vertical.bpmn${pathDelimiter}png`
+          `small.bpmn${conversionDelimiter}small_default.png`,
+          `vertical.bpmn${conversionDelimiter}png`
         ]);
 
         // then
@@ -103,7 +103,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `small.bpmn${pathDelimiter}small_custom_size.png`
+          `small.bpmn${conversionDelimiter}small_custom_size.png`
         ], {
           minDimensions: {
             width: 500,
@@ -124,7 +124,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}title_default.png`
+          `title.bpmn${conversionDelimiter}title_default.png`
         ]);
 
         // then
@@ -136,7 +136,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}custom_title.png`
+          `title.bpmn${conversionDelimiter}custom_title.png`
         ], {
           title: 'FOO BAR'
         });
@@ -150,7 +150,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}no_title.png`
+          `title.bpmn${conversionDelimiter}no_title.png`
         ], {
           title: false
         });
@@ -168,7 +168,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}no_footer.png`
+          `title.bpmn${conversionDelimiter}no_footer.png`
         ], {
           noFooter: true
         });
@@ -186,13 +186,30 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${pathDelimiter}scaled.png`
+          `title.bpmn${conversionDelimiter}scaled.png`
         ], {
           scale: 0.6
         });
 
         // then
         expectExists('scaled.png', true);
+      });
+
+
+      it('should reject legacy semicolon separator', async function() {
+
+        // when
+        const {
+          exitCode,
+          stderr
+        } = await runCli([
+          'diagram.bpmn;png'
+        ]);
+
+        // then
+        expect(exitCode).to.equal(1);
+        expect(stderr).to.contain('legacy `;` separator is not supported');
+        expect(stderr).to.contain('<diagramFile>:<outputConfig>');
       });
 
     });
@@ -254,6 +271,13 @@ async function runExport(conversions, options = {}) {
   await execa('../cli.js', args, {
     stdout: 'inherit',
     stderr: 'inherit',
+    cwd: __dirname
+  });
+}
+
+function runCli(args) {
+  return execa('../cli.js', args, {
+    reject: false,
     cwd: __dirname
   });
 }

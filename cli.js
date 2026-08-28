@@ -2,7 +2,6 @@
 
 import {
   join as joinPath,
-  delimiter as pathDelimiter,
   basename
 } from 'node:path';
 
@@ -17,7 +16,7 @@ import {
 const cli = meow(`
   Usage
 
-    $ bpmn-to-image <diagramFile>${pathDelimiter}<outputConfig> ...
+    $ bpmn-to-image <diagramFile>:<outputConfig> ...
 
   Options
 
@@ -36,13 +35,13 @@ const cli = meow(`
   Examples
 
     # export to diagram.png
-    $ bpmn-to-image diagram.bpmn${pathDelimiter}diagram.png
+    $ bpmn-to-image diagram.bpmn:diagram.png
 
     # export diagram.png and /tmp/diagram.pdf
-    $ bpmn-to-image diagram.bpmn${pathDelimiter}diagram.png,/tmp/diagram.pdf
+    $ bpmn-to-image diagram.bpmn:diagram.png,/tmp/diagram.pdf
 
     # export with minimum size of 500x300 pixels
-    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn${pathDelimiter}png
+    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn:png
 `, {
   importMeta: import.meta,
   flags: {
@@ -68,16 +67,21 @@ if (cli.input.length === 0) {
 
 const conversions = cli.input.map(function(conversion) {
 
-  const hasDelimiter = conversion.includes(pathDelimiter);
+  if (conversion.includes(';')) {
+    console.error(chalk.bold.red('  Error: legacy `;` separator is not supported; use <diagramFile>:<outputConfig>'));
+    cli.showHelp(1);
+  }
+
+  const hasDelimiter = conversion.includes(':');
   if (!hasDelimiter) {
-     console.error(chalk.bold.red(`  Error: no <diagramFile>${pathDelimiter}<outputConfig> param provided`));
-     cli.showHelp(1);
+    console.error(chalk.bold.red('  Error: no <diagramFile>:<outputConfig> param provided'));
+    cli.showHelp(1);
   }
 
   const [
     input,
     output
-  ] = conversion.split(pathDelimiter);
+  ] = conversion.split(':');
 
   const outputs = output.split(',').reduce(function(outputs, file, idx) {
 
