@@ -10,7 +10,7 @@ const {
 
 const { execa } = require('execa');
 
-const conversionDelimiter = ':';
+const pathDelimiter = ':';
 
 describe('cli', function() {
 
@@ -34,7 +34,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn${conversionDelimiter}pdf`
+        `diagram.bpmn${pathDelimiter}pdf`
       ]);
 
       // then
@@ -47,7 +47,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `${ joinPath(__dirname, 'complex.bpmn') }${conversionDelimiter}complex_export.pdf,complex_img.png`
+        `${ joinPath(__dirname, 'complex.bpmn') }${pathDelimiter}complex_export.pdf,complex_img.png`
       ]);
 
       // then
@@ -60,7 +60,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn${conversionDelimiter}${ joinPath(__dirname, 'diagram_export.png') },pdf`
+        `diagram.bpmn${pathDelimiter}${ joinPath(__dirname, 'diagram_export.png') },pdf`
       ]);
 
       // then
@@ -73,8 +73,8 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `diagram.bpmn${conversionDelimiter}png`,
-        `complex.bpmn${conversionDelimiter}png`
+        `diagram.bpmn${pathDelimiter}png`,
+        `complex.bpmn${pathDelimiter}png`
       ]);
 
       // then
@@ -89,8 +89,8 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `small.bpmn${conversionDelimiter}small_default.png`,
-          `vertical.bpmn${conversionDelimiter}png`
+          `small.bpmn${pathDelimiter}small_default.png`,
+          `vertical.bpmn${pathDelimiter}png`
         ]);
 
         // then
@@ -103,7 +103,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `small.bpmn${conversionDelimiter}small_custom_size.png`
+          `small.bpmn${pathDelimiter}small_custom_size.png`
         ], {
           minDimensions: {
             width: 500,
@@ -124,7 +124,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${conversionDelimiter}title_default.png`
+          `title.bpmn${pathDelimiter}title_default.png`
         ]);
 
         // then
@@ -136,7 +136,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${conversionDelimiter}custom_title.png`
+          `title.bpmn${pathDelimiter}custom_title.png`
         ], {
           title: 'FOO BAR'
         });
@@ -150,7 +150,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${conversionDelimiter}no_title.png`
+          `title.bpmn${pathDelimiter}no_title.png`
         ], {
           title: false
         });
@@ -168,7 +168,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${conversionDelimiter}no_footer.png`
+          `title.bpmn${pathDelimiter}no_footer.png`
         ], {
           noFooter: true
         });
@@ -186,7 +186,7 @@ describe('cli', function() {
 
         // when
         await runExport([
-          `title.bpmn${conversionDelimiter}scaled.png`
+          `title.bpmn${pathDelimiter}scaled.png`
         ], {
           scale: 0.6
         });

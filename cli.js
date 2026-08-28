@@ -12,11 +12,12 @@ import {
   convertAll
 } from 'bpmn-to-image';
 
+const pathDelimiter = ':';
 
 const cli = meow(`
   Usage
 
-    $ bpmn-to-image <diagramFile>:<outputConfig> ...
+    $ bpmn-to-image <diagramFile>${pathDelimiter}<outputConfig> ...
 
   Options
 
@@ -35,13 +36,13 @@ const cli = meow(`
   Examples
 
     # export to diagram.png
-    $ bpmn-to-image diagram.bpmn:diagram.png
+    $ bpmn-to-image diagram.bpmn${pathDelimiter}diagram.png
 
     # export diagram.png and /tmp/diagram.pdf
-    $ bpmn-to-image diagram.bpmn:diagram.png,/tmp/diagram.pdf
+    $ bpmn-to-image diagram.bpmn${pathDelimiter}diagram.png,/tmp/diagram.pdf
 
     # export with minimum size of 500x300 pixels
-    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn:png
+    $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn${pathDelimiter}png
 `, {
   importMeta: import.meta,
   flags: {
@@ -68,16 +69,16 @@ if (cli.input.length === 0) {
 const conversions = cli.input.map(function(conversion) {
 
   if (conversion.includes(';')) {
-    console.error(chalk.bold.red('  Error: legacy `;` separator is not supported; use <diagramFile>:<outputConfig>'));
+    console.error(chalk.bold.red(`  Error: legacy \`;\` separator is not supported; use <diagramFile>${pathDelimiter}<outputConfig>`));
     cli.showHelp(1);
   }
 
   const delimiterIndex = /^[a-z]:/i.test(conversion) ?
-    conversion.indexOf(':', 2) :
-    conversion.indexOf(':');
+    conversion.indexOf(pathDelimiter, 2) :
+    conversion.indexOf(pathDelimiter);
 
   if (delimiterIndex === -1) {
-    console.error(chalk.bold.red('  Error: no <diagramFile>:<outputConfig> param provided'));
+    console.error(chalk.bold.red(`  Error: no <diagramFile>${pathDelimiter}<outputConfig> param provided`));
     cli.showHelp(1);
   }
 
