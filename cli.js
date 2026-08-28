@@ -72,16 +72,17 @@ const conversions = cli.input.map(function(conversion) {
     cli.showHelp(1);
   }
 
-  const hasDelimiter = conversion.includes(':');
-  if (!hasDelimiter) {
+  const delimiterIndex = /^[a-z]:/i.test(conversion) ?
+    conversion.indexOf(':', 2) :
+    conversion.indexOf(':');
+
+  if (delimiterIndex === -1) {
     console.error(chalk.bold.red('  Error: no <diagramFile>:<outputConfig> param provided'));
     cli.showHelp(1);
   }
 
-  const [
-    input,
-    output
-  ] = conversion.split(':');
+  const input = conversion.slice(0, delimiterIndex);
+  const output = conversion.slice(delimiterIndex + 1);
 
   const outputs = output.split(',').reduce(function(outputs, file, idx) {
 
