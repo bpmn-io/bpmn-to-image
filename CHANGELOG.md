@@ -6,7 +6,7 @@ All notable changes to [bpmn-to-image](https://github.com/bpmn-io/bpmn-to-image)
 
 ___Note:__ Yet to be released changes appear here._
 
-* `FIX`: use a platform-independent `:` CLI separator ([#65](https://github.com/bpmn-io/bpmn-to-image/issues/65))
+* `FIX`: use a platform-independent `:` CLI separator ([#65](https://github.com/bpmn-io/bpmn-to-image/issues/65), [#67](https://github.com/bpmn-io/bpmn-to-image/pull/67))
 
 ## 0.10.0
 
