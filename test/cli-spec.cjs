@@ -47,7 +47,7 @@ describe('cli', function() {
 
       // when
       await runExport([
-        `${ joinPath(__dirname, 'complex.bpmn') }${pathDelimiter}complex_export.pdf,complex_img.png`
+        `complex.bpmn${pathDelimiter}complex_export.pdf,complex_img.png`
       ]);
 
       // then
@@ -56,11 +56,11 @@ describe('cli', function() {
     });
 
 
-    it('explicit, absolute path file names', async function() {
+    it('explicit and implicit file names', async function() {
 
       // when
       await runExport([
-        `diagram.bpmn${pathDelimiter}${ joinPath(__dirname, 'diagram_export.png') },pdf`
+        `diagram.bpmn${pathDelimiter}diagram_export.png,pdf`
       ]);
 
       // then
