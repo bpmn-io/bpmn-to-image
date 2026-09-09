@@ -32,6 +32,9 @@
   ],
   "author": "Nico Rehwaldt <https://github.com/nikku>",
   "license": "MIT",
+  "engines": {
+    "node": "24"
+  },
   "dependencies": {
     "bpmn-js": "^18.9.1",
     "chalk": "^6.0.0",
