@@ -44,6 +44,14 @@ $ bpmn-to-image --help
     $ bpmn-to-image --min-dimensions=500x300 diagram.bpmn:png
 ```
 
+__Note:__ `<diagramFile>` and `<outputConfig>` are separated by the platform's path delimiter ([`path.delimiter`](https://nodejs.org/api/path.html#pathdelimiter)): `:` on Linux and macOS, but `;` on Windows, where `:` is part of absolute paths such as `C:\diagram.bpmn`. `bpmn-to-image --help` prints the delimiter for the current platform. On Windows, the first example therefore reads:
+
+```bash
+bpmn-to-image "diagram.bpmn;diagram.png"
+```
+
+Quote the argument, because shells such as PowerShell and Bash treat `;` as a command separator.
+
 
 ## Embedding
 
